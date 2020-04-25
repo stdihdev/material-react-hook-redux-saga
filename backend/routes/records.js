@@ -4,7 +4,7 @@ const Roles = require('../constants/role');
 const recordCtrl = require('../controllers/records');
 const permissions = require('../helper/permissions');
 
-router.use(permissions.canModifyRecord([Roles.ADMIN, Roles.USER]));
+router.use(permissions.isRole([Roles.ADMIN, Roles.USER]));
 
 // Get record list and create one
 router.route('/')
@@ -20,6 +20,6 @@ router.route('/:id')
 // export html
 
 // get record by id.
-router.param('id', recordCtrl.getRecordByID);
+router.param('id', recordCtrl.getRecordById);
 
 module.exports = router;
