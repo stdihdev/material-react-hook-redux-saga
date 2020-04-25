@@ -25,7 +25,7 @@ const UserSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 		minlength: 5,
-		maxlength: 255,
+		maxlength: 50,
 		unique: true,
 		trim: true
 	},
@@ -33,7 +33,7 @@ const UserSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 		minlength: 3,
-		maxlength: 255
+		maxlength: 50
 	},
 	role: {
 		type: String,
@@ -81,7 +81,7 @@ const validateUser = (user) => {
 	const schema = {
 		firstName: Joi.string().min(3).max(50).required(),
 		lastName: Joi.string().min(3).max(50).required(),
-    email: Joi.string().min(5).max(255).required().email(),
+    email: Joi.string().min(5).max(50).required().email(),
 		password: Joi.string().min(3).max(50).required(),
 		role: Joi.number().integer().optional().allow([...Object.values(ROLES), null]).default(ROLES.USER),
 		preferredWorkingHours: Joi.number().optional().min(1).max(24).default(8)

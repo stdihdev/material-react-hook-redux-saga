@@ -1,11 +1,12 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const authRoute = require('./auth');
 const userRoute = require('./users');
 const recordRoute = require('./records');
+const authMiddleware = require('../middleware/auth');
 
 router.use('/auth', authRoute);
-router.use('/users', userRoute);
-router.use('/records', recordRoute);
+router.use('/users', authMiddleware, userRoute);
+router.use('/records', authMiddleware, recordRoute);
 
 module.exports = router;

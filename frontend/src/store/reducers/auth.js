@@ -1,13 +1,13 @@
 /* eslint-disable no-unused-vars */
 import { createAction, handleActions } from 'redux-actions';
 import { Success, Fail } from '../api/status';
-import { LOGIN, LOGOUT, SIGNUP } from '../constant';
+import { SIGNIN, SIGNOUT, SIGNUP } from '../constant';
 // ------------------------------------
 // Actions
 // ------------------------------------
 
-export const login = createAction(LOGIN);
-export const logout = createAction(LOGIN, () => {
+export const signin = createAction(SIGNIN);
+export const signout = createAction(SIGNIN, () => {
   localStorage.removeItem('time_management_info');
 });
 export const signup = createAction(SIGNUP);
@@ -31,39 +31,39 @@ const getInitialState = () => {
 // Reducer
 // ------------------------------------
 export default handleActions({
-  [Success(LOGIN)]: (state, { payload }) => ({
+  [Success(SIGNIN)]: (state, { payload }) => ({
     ...state,
     token: payload.token,
-    status: Success(LOGIN),
+    status:'SUCCESS',
     me: payload.info
   }),
 
-  [Fail(LOGIN)]: (state, { payload }) => ({
+  [Fail(SIGNIN)]: (state, { payload }) => ({
     ...state,
     token: null,
-    status: Fail(LOGIN),
+    status: 'FAIL',
     me: null,
     error: payload
   }),
 
   [Success(SIGNUP)]: (state, { payload }) => ({
     ...state,
-    status: Success(SIGNUP),
+    status: 'SUCCESS',
     error: null
   }),
 
   [Fail(SIGNUP)]: (state, { payload }) => ({
     ...state,
     token: null,
-    status: Fail(SIGNUP),
+    status: 'FAIL',
     me: null,
     error: payload
   }),
 
-  [LOGOUT]: (state, { payload }) => ({
+  [SIGNOUT]: (state, { payload }) => ({
     ...state,
     token: null,
-    status: LOGOUT,
+    status: SIGNOUT,
     me: null,
     error: null
   })

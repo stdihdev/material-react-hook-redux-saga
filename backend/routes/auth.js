@@ -1,10 +1,10 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const authCtrl = require('../controllers/auth');
-/* GET users listing. */
+/* User signin . */
 router.route('/login')
   .post(authCtrl.signIn);
-
+// user sign up
 router.route('/signup')
   .post(authCtrl.signUp);
 

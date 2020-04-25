@@ -27,17 +27,17 @@ export default ({
   const {
     body,
     params,
-    success: successCallback
+    success: successCallback,
+    fail: failCallback,
   } = (action.payload || {});
 
   try {
     yield put({
       type: Pending(type)
     });
-
     const options = {
       // eslint-disable-next-line no-undef
-      url: process.env.REACT_APP_API_ROOT + '/' + (typeof path === 'function' ? path(action) : path),
+      url: process.env.REACT_APP_API_ROOT + '/api' + (typeof path === 'function' ? path(action) : path),
       method: method.toLowerCase(),
       headers: Object.assign({}, defaultHeaders(), headers),
       data: body,
@@ -60,5 +60,6 @@ export default ({
       type: Fail(type),
       payload: errRes
     });
+    failCallback && failCallback(err);
   }
 };

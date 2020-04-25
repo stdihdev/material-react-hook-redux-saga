@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
 import { takeLatest } from 'redux-saga/effects';
-import { LOGIN, SIGNUP } from '../constant';
+import { SIGNIN, SIGNUP } from '../constant';
 import apiCall from '../api/apiCall';
 
-const doLogin = apiCall({
-  type: LOGIN,
+const signin = apiCall({
+  type: SIGNIN,
   method: 'post',
   path: () => '/auth/login/',
   success: (res, action) => {
@@ -12,16 +12,16 @@ const doLogin = apiCall({
   }
 });
 
-const doSignup = apiCall({
+const signup = apiCall({
   type: SIGNUP,
   method: 'post',
-  path: () => '/auth/register/',
+  path: () => '/auth/signup/',
   success: () => {
     localStorage.removeItem('time_management_info');
   }
 });
 
 export default function* rootSaga () {
-  yield takeLatest(LOGIN, doLogin);
-  yield takeLatest(SIGNUP, doSignup);
+  yield takeLatest(SIGNIN, signin);
+  yield takeLatest(SIGNUP, signup);
 }

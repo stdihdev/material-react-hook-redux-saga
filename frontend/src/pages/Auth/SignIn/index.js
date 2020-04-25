@@ -11,11 +11,12 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { connect } from "react-redux";
-import { login } from '../../store/reducers/auth';
+import { signin } from '../../../store/reducers/auth';
 import { compose } from 'redux';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';
+import { withRouter } from 'react-router';
 
 const initialValues = {
   email: "",
@@ -75,12 +76,18 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const SignIn = props => {
+function SignIn(props) {
   const classes = useStyles();
-  const { login } = props;
+  const { signin, history } = props;
 
-  const handleSubmit = (data) => {
-    login(data);
+  const handleSubmit = (values, actions) => {
+    signin({ 
+      body: values,
+      success: () => {
+        actions.setSubmitting(false);
+      },
+      fail: () => actions.setSubmitting(false)
+    });
   };
 
   return (
@@ -148,20 +155,22 @@ const SignIn = props => {
       </Box>
     </Container>
   );
-};
+}
 
 SignIn.propTypes = {
-  login: PropTypes.func.isRequired
+  signin: PropTypes.func.isRequired,
+  history: PropTypes.object.isRequired,
 };
 
 
 
 const mapStateToProps = state => ({
-  auth: state.auth
+  auth: state.auth,
+  error: state.auth.error
 });
 
 const mapDispatchToProps = {
-  login: login
+  signin: signin
 };
 
 export default compose(
