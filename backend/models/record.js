@@ -1,5 +1,6 @@
 const Joi = require('joi');
 const mongoose = require('mongoose');
+Joi.objectId = require('joi-objectid')(Joi);
 
 //user schema
 const RecordSchema = new mongoose.Schema({
@@ -26,9 +27,19 @@ const RecordSchema = new mongoose.Schema({
 
 const validateRecord = (record) => {
 	const schema = {
-    date: Joi.date().allow(null, '').optional().default(null),
+    date: Joi.date().required().default(Date.now()),
     hour: Joi.number().required().min(0).max(24).default(0),
     note: Joi.string().optional().default('')
+	};
+
+	return Joi.validate(record, schema);
+}
+
+const validateUpdateRecord = (record) => {
+	const schema = {
+    date: Joi.date().optional(),
+    hour: Joi.number().optional().min(0).max(24),
+    note: Joi.string().optional(),
 	};
 
 	return Joi.validate(record, schema);
@@ -38,3 +49,4 @@ const Record = mongoose.model('Record', RecordSchema);
 
 exports.Record = Record;
 exports.validate = validateRecord;
+exports.validateUpdate = validateUpdateRecord;

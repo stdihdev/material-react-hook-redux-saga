@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { takeLatest } from 'redux-saga/effects';
-import { SIGNIN, SIGNUP } from '../constant';
+import { SIGNIN, SIGNUP } from '../constants';
 import apiCall from '../api/apiCall';
 
 const signin = apiCall({

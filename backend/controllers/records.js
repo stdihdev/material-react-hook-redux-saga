@@ -1,10 +1,9 @@
-const { Record, validate } = require("../models/record");
+const { Record, validate, validateUpdate } = require("../models/record");
 const Roles = require('../constants/role');
 const { canModifyRecord } = require('../helper/permissions');
 
-async function validateTotalHours(date, record) {
-  let where={date: date};
-  if(record._id) where._id = {$ne: record._id};
+async function validateTotalHours(record) {
+  let where={date: record.date, _id: {$ne: record._id}};
 
   const records = await Record.find(where);
   if(records.length) {
@@ -25,13 +24,16 @@ function read(req, res, next) {
 
 async function list(req, res, next) {
   try {
+    const { page = 1, limit = 10 } = req.query;
     let where = {};
     if (req.user.role === Roles.USER) {
       where = {user: req.user._id};
     }
 
-    const records = await Record.find(where).populate('user', '-password');
-    res.json(records);
+    const records = await Record.find(where).limit(limit).skip((page - 1) * limit).populate('user', '-password');
+    const count = await Record.countDocuments();
+
+    res.json({records, params: {limit, page, count}});
 
   } catch (error) {
     next(error);
@@ -41,12 +43,12 @@ async function list(req, res, next) {
 async function create(req, res, next) {
   try {
     const { error } = validate(req.body);
-
     if (error) return res.status(400).send(error.details[0].message);
+
     const record = new Record(req.body);
     record.user = req.user._id;
   
-    if(!await validateTotalHours(req.body.date, record)) {
+    if(!await validateTotalHours(record)) {
       return res.status(400).send("Worked more than 24hours!");
     }
 
@@ -60,14 +62,17 @@ async function create(req, res, next) {
 
 async function update(req, res, next) {
   try {
-    const record = new Record(req.body);
+    const { error } = validateUpdate(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
+    const record = new Record({...req.record._doc, ...req.body});
     record._id = req.record._id;
 
-    if(!await validateTotalHours(req.record.date, record)) {
+    if(!await validateTotalHours(record)) {
       return res.status(400).send("Worked more than 24hours!");
     }
 
-    const updatedRecord = await Record.findByIdAndUpdate(req.record._id, record, {upsert: true, useFindAndModify: false});
+    const updatedRecord = await Record.findByIdAndUpdate(req.record._id, record, {upsert: true, useFindAndModify: false, new: true});
     res.json(updatedRecord);
 
   } catch (error) {

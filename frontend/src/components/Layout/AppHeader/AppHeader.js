@@ -7,6 +7,8 @@ import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import { NavLink } from 'react-router-dom';
+import { compose } from 'redux';
+import { connect } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -27,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function AppHeader() {
+function AppHeader() {
   const classes = useStyles();
 
   return (
@@ -51,3 +53,19 @@ export default function AppHeader() {
     </div>
   );
 }
+
+AppHeader.propTypes = {
+
+};
+
+const mapStateToProps = state => ({
+  auth: state.auth
+});
+
+const mapDispatchToProps = {
+
+};
+
+export default compose(
+  connect(mapStateToProps, mapDispatchToProps)
+)(AppHeader);

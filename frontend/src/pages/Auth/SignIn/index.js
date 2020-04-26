@@ -16,7 +16,6 @@ import { compose } from 'redux';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router';
 
 const initialValues = {
   email: "",
@@ -78,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
 
 function SignIn(props) {
   const classes = useStyles();
-  const { signin, history } = props;
+  const { signin } = props;
 
   const handleSubmit = (values, actions) => {
     signin({ 
@@ -159,7 +158,7 @@ function SignIn(props) {
 
 SignIn.propTypes = {
   signin: PropTypes.func.isRequired,
-  history: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired
 };
 
 

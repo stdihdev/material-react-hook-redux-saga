@@ -28,7 +28,7 @@ export default ({
     body,
     params,
     success: successCallback,
-    fail: failCallback,
+    fail: failCallback
   } = (action.payload || {});
 
   try {
@@ -37,13 +37,13 @@ export default ({
     });
     const options = {
       // eslint-disable-next-line no-undef
-      url: process.env.REACT_APP_API_ROOT + '/api' + (typeof path === 'function' ? path(action) : path),
+      url: process.env.REACT_APP_API_ROOT + '/api' + (typeof path === 'function' ? path(action.payload) : path),
       method: method.toLowerCase(),
       headers: Object.assign({}, defaultHeaders(), headers),
       data: body,
       params
     };
-    const res = yield call(axios.request, options );
+    const res = yield call(axios.request, options);
 
     yield put({
       type: Success(type),

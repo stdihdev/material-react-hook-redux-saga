@@ -6,7 +6,7 @@ const permissions = require('../helper/permissions');
 
 router.use(permissions.isRole([Roles.ADMIN, Roles.USER]));
 
-// Get record list and create one
+// Get records listing and create one
 router.route('/')
   .get(recordCtrl.list)
   .post(recordCtrl.create);
