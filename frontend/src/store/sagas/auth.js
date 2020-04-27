@@ -24,7 +24,7 @@ const signup = apiCall({
 const setHours = apiCall({
   type: SET_HOURS,
   method: 'post',
-  path: () => '/users/updateHours/',
+  path: () => '/auth/updateHours/',
   success: (res, action) => {
     localStorage.setItem('time_management_info', JSON.stringify(res.data));
   }

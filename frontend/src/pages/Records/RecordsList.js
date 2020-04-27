@@ -28,7 +28,8 @@ function RecordsList(props){
     postRecord,
     showSnack,
     putRecord,
-    deleteRecord
+    deleteRecord,
+    info
   } = props;
   const columns = [
     { title: 'No', render: rowData => rowData && rowData.tableData.id + 1, disableClick: true, editable: 'never' },
@@ -62,7 +63,10 @@ function RecordsList(props){
           options={
             {
               search: false,
-              actionsColumnIndex: -1
+              actionsColumnIndex: -1,
+              rowStyle: rowData => ({
+                backgroundColor: (rowData.hour > info.preferredWorkingHours ? '#4caf50' : '#f44336')
+              })
             }
           }
           columns={columns}
@@ -134,11 +138,13 @@ RecordsList.propTypes = {
   putRecord: PropTypes.func.isRequired,
   deleteRecord: PropTypes.func.isRequired,
   records: PropTypes.array.isRequired,
-  showSnack: PropTypes.func.isRequired
+  showSnack: PropTypes.func.isRequired,
+  info: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
-  records: state.record.records
+  records: state.record.records,
+  info: state.auth.me
 });
 
 const mapDispatchToProps = {

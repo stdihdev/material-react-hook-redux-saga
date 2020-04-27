@@ -33,7 +33,7 @@ const UserSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 		minlength: 3,
-		maxlength: 50
+		maxlength: 250
 	},
 	role: {
 		type: String,
@@ -90,5 +90,19 @@ const validateUser = (user) => {
 	return Joi.validate(user, schema);
 }
 
+const validateUpdateUser = (user) => {
+	const schema = {
+		firstName: Joi.string().min(3).max(50).optional(),
+		lastName: Joi.string().min(3).max(50).optional(),
+    email: Joi.string().min(5).max(50).optional().email(),
+		password: Joi.string().min(3).max(50).optional(),
+		role: Joi.number().integer().optional().allow([...Object.values(ROLES), null]).default(ROLES.USER),
+		preferredWorkingHours: Joi.number().optional().min(1).max(24).default(8)
+	};
+
+	return Joi.validate(user, schema);
+}
+
 exports.User = User;
 exports.validate = validateUser;
+exports.validateUpdate = validateUpdateUser;
