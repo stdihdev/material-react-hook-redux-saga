@@ -47,19 +47,19 @@ function AppHeader(props) {
           </Typography>
           { me
             ? <>
-              <NavLink className={classes.navLink} activeClassName={classes.active} to="/logout" onClick={signout} >
-                <Button color="inherit">Log Out</Button>
-              </NavLink>
               {(me.role === 'admin' || me.role === 'manager') &&
               <NavLink className={classes.navLink} activeClassName={classes.active} to="/users">
                 <Button color="inherit">Users</Button>
               </NavLink>
               }
-              {(me.role === 'admin') &&
+              {(me.role === 'admin' || me.role === 'manager') &&
               <NavLink className={classes.navLink} activeClassName={classes.active} to="/records">
                 <Button color="inherit">Records</Button>
               </NavLink>
               }
+              <NavLink className={classes.navLink} activeClassName={classes.active} to="/logout" onClick={signout} >
+                <Button color="inherit">Log Out</Button>
+              </NavLink>
             </>
             : <>
               <NavLink className={classes.navLink} activeClassName={classes.active} to="/login">

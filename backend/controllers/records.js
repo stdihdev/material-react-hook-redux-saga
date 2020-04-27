@@ -26,7 +26,7 @@ async function list(req, res, next) {
   try {
     const { page = 1, limit = 10 } = req.query;
     let where = {};
-    if (req.user.role === Roles.USER) {
+    if (req.user.role === Roles.USER || req.user.role === Roles.MANAGER) {
       where = {user: req.user._id};
     }
 
