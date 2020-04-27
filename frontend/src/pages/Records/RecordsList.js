@@ -1,23 +1,24 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import MaterialTable from 'material-table';
 import Container from '@material-ui/core/Container';
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert from '@material-ui/lab/Alert';
+import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
-import { getRecords, postRecord, hideSnack, putRecord, deleteRecord } from '../../store/reducers/record';
+import { getRecords, postRecord, putRecord, deleteRecord } from '../../store/reducers/record';
+import { showSnack } from '../../store/reducers/snack';
 import { compose } from 'redux';
 import { connect } from "react-redux";
 import PropTypes from 'prop-types';
+import PreferredHoursForm from '../../components/PreferredHoursForm';
+import Snack from '../../components/Snack';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8)
+  },
+  margin: {
+    margin: theme.spacing(2, 0)
   }
 }));
-
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
 function RecordsList(props){
   const classes = useStyles();
@@ -25,8 +26,7 @@ function RecordsList(props){
     getRecords,
     records,
     postRecord,
-    error,
-    hideSnack,
+    showSnack,
     putRecord,
     deleteRecord
   } = props;
@@ -36,6 +36,15 @@ function RecordsList(props){
     { title: 'Note', field: 'note' },
     { title: 'Hour', field: 'hour', type: 'numeric' }
   ];
+  const [open, setOpen] = useState(false);
+
+  const handleOpenDialog = () => {
+    setOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpen(false);
+  };
 
   useEffect(() => {
     getRecords();
@@ -44,14 +53,18 @@ function RecordsList(props){
   return (
     <Container component="main">
       <div className={classes.paper}>
-        <Snackbar open={!!error} autoHideDuration={2000} onClose={() => hideSnack()}>
-          <Alert  severity="error">
-            {error}
-          </Alert>
-        </Snackbar>
+        <Snack/>
+        <Button variant="contained" color="primary" onClick={handleOpenDialog} className={classes.margin}>
+          Set Preferred Working Hours
+        </Button>
         <MaterialTable
           title="Time Records"
-          options={{ search: false }}
+          options={
+            {
+              search: false,
+              actionsColumnIndex: -1
+            }
+          }
           columns={columns}
           data={records}
           editable={{
@@ -59,8 +72,14 @@ function RecordsList(props){
               setTimeout(() => {
                 postRecord({
                   body: newData,
-                  success: () => resolve(),
-                  fail: () => reject()
+                  success: () => {
+                    resolve();
+                    showSnack({ message: "Time Record created.", status: 'success' });
+                  },
+                  fail: (err) => {
+                    reject();
+                    showSnack({ message: err.response.data, status: 'error' });
+                  }
                 });
               }, 600);
             }),
@@ -74,8 +93,14 @@ function RecordsList(props){
                       note: newData.note,
                       date: newData.date
                     },
-                    success: () => resolve(),
-                    fail: () => reject()
+                    success: () => {
+                      resolve();
+                      showSnack({ message: "Time Record updated.", status: 'success' });
+                    },
+                    fail: (err) => {
+                      reject();
+                      showSnack({ message: err.response.data, status: 'error' });
+                    }
                   });
                 }, 600);
               }),
@@ -84,14 +109,21 @@ function RecordsList(props){
                 setTimeout(() => {
                   deleteRecord({
                     id: oldData._id,
-                    success: () => resolve(),
-                    fail: () => reject()
+                    success: () => {
+                      resolve();
+                      showSnack({ message: "Time Record removed.", status: 'success' });
+                    },
+                    fail: (err) => {
+                      reject();
+                      showSnack({ message: err.response.data, status: 'error' });
+                    }
                   });
                 }, 600);
               })
           }}
         />
       </div>
+      <PreferredHoursForm open={open} handleClose={handleCloseDialog}/>
     </Container>
   );
 }
@@ -99,22 +131,20 @@ function RecordsList(props){
 RecordsList.propTypes = {
   getRecords: PropTypes.func.isRequired,
   postRecord: PropTypes.func.isRequired,
-  hideSnack: PropTypes.func.isRequired,
   putRecord: PropTypes.func.isRequired,
   deleteRecord: PropTypes.func.isRequired,
   records: PropTypes.array.isRequired,
-  error: PropTypes.string
+  showSnack: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
-  records: state.record.records,
-  error: state.record.error
+  records: state.record.records
 });
 
 const mapDispatchToProps = {
   getRecords: getRecords,
   postRecord: postRecord,
-  hideSnack: hideSnack,
+  showSnack: showSnack,
   putRecord: putRecord,
   deleteRecord: deleteRecord
 };

@@ -9,6 +9,8 @@ import MenuIcon from '@material-ui/icons/Menu';
 import { NavLink } from 'react-router-dom';
 import { compose } from 'redux';
 import { connect } from "react-redux";
+import PropTypes from 'prop-types';
+import { signout } from '../../../store/reducers/auth';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,7 +31,8 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function AppHeader() {
+function AppHeader(props) {
+  const { me, signout } = props;
   const classes = useStyles();
 
   return (
@@ -42,12 +45,31 @@ function AppHeader() {
           <Typography variant="h6" className={classes.title}>
             Time Management System
           </Typography>
-          <NavLink className={classes.navLink} activeClassName={classes.active} to="/login">
-            <Button color="inherit">Login</Button>
-          </NavLink>
-          <NavLink className={classes.navLink} activeClassName={classes.active} to="/signup">
-            <Button color="inherit">SignUp</Button>
-          </NavLink>
+          { me
+            ? <>
+              <NavLink className={classes.navLink} activeClassName={classes.active} to="/logout" onClick={signout} >
+                <Button color="inherit">Log Out</Button>
+              </NavLink>
+              {(me.role === 'admin' || me.role === 'manager') &&
+              <NavLink className={classes.navLink} activeClassName={classes.active} to="/users">
+                <Button color="inherit">Users</Button>
+              </NavLink>
+              }
+              {(me.role === 'admin') &&
+              <NavLink className={classes.navLink} activeClassName={classes.active} to="/records">
+                <Button color="inherit">Records</Button>
+              </NavLink>
+              }
+            </>
+            : <>
+              <NavLink className={classes.navLink} activeClassName={classes.active} to="/login">
+                <Button color="inherit">Login</Button>
+              </NavLink>
+              <NavLink className={classes.navLink} activeClassName={classes.active} to="/signup">
+                <Button color="inherit">SignUp</Button>
+              </NavLink>
+            </>
+          }
         </Toolbar>
       </AppBar>
     </div>
@@ -55,15 +77,16 @@ function AppHeader() {
 }
 
 AppHeader.propTypes = {
-
+  me: PropTypes.object,
+  signout: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
-  auth: state.auth
+  me: state.auth.me
 });
 
 const mapDispatchToProps = {
-
+  signout
 };
 
 export default compose(

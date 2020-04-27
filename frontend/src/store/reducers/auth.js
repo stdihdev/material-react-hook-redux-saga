@@ -1,15 +1,16 @@
 /* eslint-disable no-unused-vars */
 import { createAction, handleActions } from 'redux-actions';
 import { Success, Fail } from '../api/status';
-import { SIGNIN, SIGNOUT, SIGNUP } from '../constants';
+import { SIGNIN, SIGNOUT, SIGNUP, SET_HOURS } from '../constants';
 
 // Actions
 
 export const signin = createAction(SIGNIN);
+export const signup = createAction(SIGNUP);
+export const setHours = createAction(SET_HOURS);
 export const signout = createAction(SIGNIN, () => {
   localStorage.removeItem('time_management_info');
 });
-export const signup = createAction(SIGNUP);
 
 const getInitialState = () => {
   let authInfo = JSON.parse(localStorage.getItem('time_management_info') || null);
@@ -54,6 +55,19 @@ export default handleActions({
     token: null,
     status: 'FAIL',
     me: null,
+    error: payload
+  }),
+
+  [Success(SET_HOURS)]: (state, { payload }) => ({
+    ...state,
+    token: payload.token,
+    status:'SUCCESS',
+    me: payload.info
+  }),
+
+  [Fail(SET_HOURS)]: (state, { payload }) => ({
+    ...state,
+    status: 'FAIL',
     error: payload
   }),
 

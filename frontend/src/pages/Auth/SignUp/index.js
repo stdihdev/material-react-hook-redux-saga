@@ -16,6 +16,9 @@ import { compose } from 'redux';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';
+import { useHistory } from 'react-router-dom';
+import Snack from '../../../components/Snack';
+import { showSnack } from '../../../store/reducers/snack';
 
 function Copyright() {
   return (
@@ -48,7 +51,7 @@ const validate = values => {
   requiredFields.forEach(field => {
     if (!values[field]) {
       errors[field] = 'Required';
-    } else if(values[field].length <= 3 || values[field].length >=50 ) {
+    } else if(values[field].length < 3 || values[field].length > 50 ) {
       errors[field] = 'length must be between 3 and 50';
     }
   });
@@ -83,13 +86,21 @@ const useStyles = makeStyles((theme) => ({
 
 function SignUp(props) {
   const classes = useStyles();
-  const { signup } = props;
+  const { signup, showSnack } = props;
+  const history = useHistory();
 
   const handleSubmit = (values, actions) => {
     signup({ 
       body: values,
-      success: () => actions.setSubmitting(false),
-      fail: () => actions.setSubmitting(false)
+      success: () => {
+        actions.setSubmitting(false);
+        history.push('/login');
+        showSnack({ message: "Successfuly Signed Up!", status: 'success' });
+      },
+      fail: (err) => {
+        actions.setSubmitting(false);
+        showSnack({ message: err.response.data, status: 'error' });
+      }
     });
   };
 
@@ -100,6 +111,7 @@ function SignUp(props) {
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
         </Avatar>
+        <Snack/>
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
@@ -198,7 +210,8 @@ function SignUp(props) {
 
 
 SignUp.propTypes = {
-  signup: PropTypes.func.isRequired
+  signup: PropTypes.func.isRequired,
+  showSnack: PropTypes.func.isRequired
 };
 
 
@@ -207,7 +220,8 @@ const mapStateToProps = () => ({
 });
 
 const mapDispatchToProps = {
-  signup: signup
+  signup: signup,
+  showSnack: showSnack
 };
 
 export default compose(

@@ -8,7 +8,6 @@ import { useSelector } from 'react-redux';
 const Routes = () => {
 
   const isAuthenticated = useSelector(state => !!state.auth.token);
-
   return (
     <Switch>
       <Route exact path='/' render={() => {
@@ -17,7 +16,10 @@ const Routes = () => {
       }} />
       <Route path='/login' component={SignIn} />
       <Route path='/signup' component={SignUp} />
-      <Route exact path="/records" component={RecordsList} />
+      {isAuthenticated && <>
+        <Route exact path="/records" component={RecordsList} />
+      </>}
+      <Route render={() => <Redirect to="/" />} />
     </Switch>
   );
 };

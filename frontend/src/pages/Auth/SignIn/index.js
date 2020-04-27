@@ -16,6 +16,9 @@ import { compose } from 'redux';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';
+import { useHistory } from 'react-router-dom';
+import Snack from '../../../components/Snack';
+import { showSnack } from '../../../store/reducers/snack';
 
 const initialValues = {
   email: "",
@@ -31,6 +34,8 @@ const validate = values => {
   requiredFields.forEach(field => {
     if (!values[field]) {
       errors[field] = 'Required';
+    } else if(values[field].length < 3 || values[field].length > 50 ) {
+      errors[field] = 'length must be between 3 and 50';
     }
   });
   if (
@@ -77,15 +82,21 @@ const useStyles = makeStyles((theme) => ({
 
 function SignIn(props) {
   const classes = useStyles();
-  const { signin } = props;
+  const { signin, showSnack } = props;
+  const history = useHistory();
 
   const handleSubmit = (values, actions) => {
     signin({ 
       body: values,
       success: () => {
         actions.setSubmitting(false);
+        history.push('/');
+        showSnack({ message: "Successfuly Logged in!", status: 'success' });
       },
-      fail: () => actions.setSubmitting(false)
+      fail: (err) => {
+        actions.setSubmitting(false);
+        showSnack({ message: err.response.data, status: 'error' });
+      }
     });
   };
 
@@ -96,6 +107,7 @@ function SignIn(props) {
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
         </Avatar>
+        <Snack/>
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
@@ -158,7 +170,8 @@ function SignIn(props) {
 
 SignIn.propTypes = {
   signin: PropTypes.func.isRequired,
-  history: PropTypes.object.isRequired
+  history: PropTypes.object.isRequired,
+  showSnack: PropTypes.func.isRequired
 };
 
 
@@ -169,7 +182,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  signin: signin
+  signin: signin,
+  showSnack: showSnack
 };
 
 export default compose(

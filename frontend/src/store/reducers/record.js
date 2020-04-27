@@ -1,6 +1,6 @@
 import { createAction, handleActions } from 'redux-actions';
 import { Success, Fail } from '../api/status';
-import { GET_RECORDS, POST_RECORD, HIDE_SNACK, PUT_RECORD, DELETE_RECORD } from '../constants';
+import { GET_RECORDS, POST_RECORD, PUT_RECORD, DELETE_RECORD } from '../constants';
 
 const initialState = {
   records: [],
@@ -15,7 +15,6 @@ const initialState = {
 // Actions
 export const getRecords = createAction(GET_RECORDS);
 export const postRecord = createAction(POST_RECORD);
-export const hideSnack = createAction(HIDE_SNACK);
 export const putRecord = createAction(PUT_RECORD);
 export const deleteRecord = createAction(DELETE_RECORD);
 
@@ -73,9 +72,5 @@ export default handleActions({
       ...state,
       error: payload.data
     });
-  },
-  [HIDE_SNACK]: (state) => ({
-    ...state,
-    error: ''
-  })
+  }
 }, initialState);
