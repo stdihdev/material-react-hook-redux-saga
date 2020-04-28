@@ -12,6 +12,14 @@ export const PUT_RECORD = 'PUT_RECORD';
 export const DELETE_RECORD = 'DELETE_RECORD';
 export const SET_PAGINATION = 'SET_PAGINATION';
 
+// User Records
+export const GET_USER = 'GET_USER';
+export const GET_USERS = 'GET_USERS';
+export const POST_USER = 'POST_USER';
+export const PUT_USER = 'PUT_USER';
+export const DELETE_USER = 'DELETE_USER';
+// export const SET_PAGINATION = 'SET_PAGINATION';
+
 // SNACK
 export const HIDE_SNACK = 'HIDE_SNACK';
 export const SHOW_SNACK = 'SHOW_SNACK';

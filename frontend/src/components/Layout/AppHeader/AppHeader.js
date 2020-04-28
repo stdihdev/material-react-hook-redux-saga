@@ -11,6 +11,7 @@ import { compose } from 'redux';
 import { connect } from "react-redux";
 import PropTypes from 'prop-types';
 import { signout } from '../../../store/reducers/auth';
+import ROLES from '../../../data/role';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -47,12 +48,12 @@ function AppHeader(props) {
           </Typography>
           { me
             ? <>
-              {(me.role === 'admin' || me.role === 'manager') &&
+              {(me.role >= ROLES.MANAGER) &&
               <NavLink className={classes.navLink} activeClassName={classes.active} to="/users">
                 <Button color="inherit">Users</Button>
               </NavLink>
               }
-              {(me.role === 'admin' || me.role === 'manager') &&
+              {(me.role >= ROLES.MANAGER) &&
               <NavLink className={classes.navLink} activeClassName={classes.active} to="/records">
                 <Button color="inherit">Records</Button>
               </NavLink>

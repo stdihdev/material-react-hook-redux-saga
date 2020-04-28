@@ -1,71 +1,128 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import MaterialTable from 'material-table';
+import Container from '@material-ui/core/Container';
+import { makeStyles } from '@material-ui/core/styles';
+import { getUsers, postUser, putUser, deleteUser } from '../../store/reducers/user';
+import { showSnack } from '../../store/reducers/snack';
+import { compose } from 'redux';
+import { connect } from "react-redux";
+import PropTypes from 'prop-types';
+import Snack from '../../components/Snack';
+import ROLES from '../../data/role';
 
-export default function MaterialTableDemo() {
-  const [state, setState] = React.useState({
-    columns: [
-      { title: 'Name', field: 'name' },
-      { title: 'Surname', field: 'surname' },
-      { title: 'Birth Year', field: 'birthYear', type: 'numeric' },
-      {
-        title: 'Birth Place',
-        field: 'birthCity',
-        lookup: { 34: 'İstanbul', 63: 'Şanlıurfa' }
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    marginTop: theme.spacing(8)
+  },
+  margin: {
+    margin: theme.spacing(2, 0)
+  }
+}));
+
+function UsersList(props){
+  const classes = useStyles();
+  const {
+    getUsers,
+    users,
+    showSnack,
+    info,
+    deleteUser
+  } = props;
+  const columns = [
+    { title: 'No', render: rowData => rowData && rowData.tableData.id + 1, disableClick: true, editable: 'never' },
+    { title: 'Name', render: rowData => rowData && rowData.firstName + ' ' + rowData.lastName },
+    { title: 'Email', field: 'email' },
+    { title: 'Role',
+      field: 'role',
+      lookup: info.role === ROLES.ADMIN ? {
+        0: 'User',
+        1: 'Manager',
+        2: 'Admin'
+      } : {
+        0: 'User',
+        1: 'Manager'
       }
-    ],
-    data: [
-      { name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthCity: 63 },
-      {
-        name: 'Zerya Betül',
-        surname: 'Baran',
-        birthYear: 2017,
-        birthCity: 34
-      }
-    ]
-  });
+    }
+  ];
+
+  useEffect(() => {
+    getUsers();
+  }, []);
 
   return (
-    <MaterialTable
-      title="Editable Example"
-      columns={state.columns}
-      data={state.data}
-      editable={{
-        onRowAdd: (newData) =>
-          new Promise((resolve) => {
-            setTimeout(() => {
-              resolve();
-              setState((prevState) => {
-                const data = [...prevState.data];
-                data.push(newData);
-                return { ...prevState, data };
-              });
-            }, 600);
-          }),
-        onRowUpdate: (newData, oldData) =>
-          new Promise((resolve) => {
-            setTimeout(() => {
-              resolve();
-              if (oldData) {
-                setState((prevState) => {
-                  const data = [...prevState.data];
-                  data[data.indexOf(oldData)] = newData;
-                  return { ...prevState, data };
-                });
-              }
-            }, 600);
-          }),
-        onRowDelete: (oldData) =>
-          new Promise((resolve) => {
-            setTimeout(() => {
-              resolve();
-              setState((prevState) => {
-                const data = [...prevState.data];
-                data.splice(data.indexOf(oldData), 1);
-                return { ...prevState, data };
-              });
-            }, 600);
-          })
-      }}
-    />
+    <Container component="main">
+      <div className={classes.paper}>
+        <Snack/>
+        <MaterialTable
+          title="Users"
+          options={
+            {
+              search: false,
+              actionsColumnIndex: -1
+            }
+          }
+          actions={[
+            {
+              icon: 'add',
+              tooltip: 'Add User',
+              isFreeAction: true,
+              onClick: (event) => alert("You want to add a new row")
+            },
+            {
+              icon: 'edit',
+              tooltip: 'Edit User',
+              onClick: (event) => alert("You want to add a new row")
+            }
+          ]}
+          columns={columns}
+          data={users}
+          editable={{
+            onRowDelete: (oldData) =>
+              new Promise((resolve, reject) => {
+                setTimeout(() => {
+                  deleteUser({
+                    id: oldData._id,
+                    success: () => {
+                      resolve();
+                      showSnack({ message: "User removed.", status: 'success' });
+                    },
+                    fail: (err) => {
+                      reject();
+                      showSnack({ message: err.response.data, status: 'error' });
+                    }
+                  });
+                }, 600);
+              })
+          }}
+        />
+      </div>
+    </Container>
   );
 }
+
+UsersList.propTypes = {
+  getUsers: PropTypes.func.isRequired,
+  postUser: PropTypes.func.isRequired,
+  putUser: PropTypes.func.isRequired,
+  deleteUser: PropTypes.func.isRequired,
+  users: PropTypes.array.isRequired,
+  showSnack: PropTypes.func.isRequired,
+  info: PropTypes.object.isRequired
+};
+
+const mapStateToProps = state => ({
+  users: state.user.users,
+  info: state.auth.me
+});
+
+const mapDispatchToProps = {
+  getUsers: getUsers,
+  postUser: postUser,
+  showSnack: showSnack,
+  putUser: putUser,
+  deleteUser: deleteUser
+};
+
+export default compose(
+  connect(mapStateToProps, mapDispatchToProps)
+)(UsersList);

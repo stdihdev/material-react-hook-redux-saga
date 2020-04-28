@@ -8,7 +8,7 @@ async function list(req, res, next) {
   try {
     const { page = 1, limit = 10 } = req.query;
 
-    const users = await User.find().limit(limit).skip((page - 1) * limit).select('-');
+    const users = await User.find({_id: {$ne: req.user._id}, role: {$lte: req.user.role }}).limit(limit).skip((page - 1) * limit).select('-');
     const count = await User.countDocuments();
 
     res.json({users, params: {limit, page, count}});

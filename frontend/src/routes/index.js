@@ -4,6 +4,7 @@ import SignIn from '../pages/Auth/SignIn';
 import SignUp from '../pages/Auth/SignUp';
 import RecordsList from '../pages/Records/RecordsList';
 import UsersList from '../pages/Users/UsersList';
+import UserEdit from '../pages/Users/UserEdit';
 import { useSelector } from 'react-redux';
 import AdminOrManagerRoute from './private';
 
@@ -21,6 +22,8 @@ const Routes = () => {
       {isAuthenticated && <>
         <Route exact path="/records" component={RecordsList} />
         <AdminOrManagerRoute exact path="/users" component={UsersList}/>
+        <AdminOrManagerRoute exact path="/users/add" component={UserEdit}/>
+        <AdminOrManagerRoute exact path="/users/:id" component={UserEdit}/>
       </>}
       <Route render={() => <Redirect to="/" />} />
     </Switch>

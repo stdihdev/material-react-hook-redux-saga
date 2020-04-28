@@ -36,8 +36,7 @@ const UserSchema = new mongoose.Schema({
 		maxlength: 250
 	},
 	role: {
-		type: String,
-		required: true,
+		type: Number,
 		enum: Object.values(ROLES),
 		default: ROLES.USER
 	},
@@ -60,21 +59,11 @@ UserSchema.methods.encryptPassword = (password) => {
 };
 
 UserSchema.methods.isPasswordValid = function isPasswordValid(password) {
-	console.log(password, this.password)
 	return bcrypt.compareSync(password, this.password);
 }
 
 //set password before save.
 UserSchema.pre("save", function (next) {
-	if(this.password && this.isModified('password')) {
-		this.password = this.encryptPassword(this.password);
-		next();
-	} else {
-		next();
-	}
-});
-
-UserSchema.pre("findOneAndUpdate", function (next) {
 	if(this.password && this.isModified('password')) {
 		this.password = this.encryptPassword(this.password);
 		next();
