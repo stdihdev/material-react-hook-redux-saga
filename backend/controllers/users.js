@@ -56,7 +56,7 @@ async function update(req, res, next) {
 
 async function remove(req, res, next) {
   await req.userModel.remove();
-  res.json({id: req.user._id});
+  res.json({id: req.userModel._id});
 }
 
 async function getUserById(req, res, next, id) {

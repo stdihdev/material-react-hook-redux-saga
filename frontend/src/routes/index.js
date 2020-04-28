@@ -20,10 +20,16 @@ const Routes = () => {
       <Route path='/login' component={SignIn} />
       <Route path='/signup' component={SignUp} />
       {isAuthenticated && <>
-        <Route exact path="/records" component={RecordsList} />
-        <AdminOrManagerRoute exact path="/users" component={UsersList}/>
-        <AdminOrManagerRoute exact path="/users/add" component={UserEdit}/>
-        <AdminOrManagerRoute exact path="/users/:id" component={UserEdit}/>
+        <Route exact path="/records" component={RecordsList}/>
+        <AdminOrManagerRoute exact path="/users">
+          <UsersList/>
+        </AdminOrManagerRoute>
+        <AdminOrManagerRoute exact path="/add-user">
+          <UserEdit/>
+        </AdminOrManagerRoute>
+        <AdminOrManagerRoute exact path="/users/:id">
+          <UserEdit/>
+        </AdminOrManagerRoute>
       </>}
       <Route render={() => <Redirect to="/" />} />
     </Switch>

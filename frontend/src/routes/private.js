@@ -4,14 +4,14 @@ import { Route, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ROLES from '../data/role';
 
-function AdminOrManagerRoute({ component: Component, ...rest }) {
+function AdminOrManagerRoute({ children, ...rest }) {
   const info = useSelector((state) => state.auth.me);
   return (
     <Route
       {...rest}
       render={({ location }) =>
         info.role >= ROLES.MANAGER ? (
-          <Component />
+          children
         ) : (
           <Redirect
             to={{
@@ -26,7 +26,7 @@ function AdminOrManagerRoute({ component: Component, ...rest }) {
 }
 
 AdminOrManagerRoute.propTypes = {
-  component: PropTypes.func
+  children: PropTypes.element
 };
 
 export default AdminOrManagerRoute;

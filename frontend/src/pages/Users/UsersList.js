@@ -9,6 +9,7 @@ import { connect } from "react-redux";
 import PropTypes from 'prop-types';
 import Snack from '../../components/Snack';
 import ROLES from '../../data/role';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -44,6 +45,7 @@ function UsersList(props){
       }
     }
   ];
+  const history = useHistory();
 
   useEffect(() => {
     getUsers();
@@ -66,12 +68,12 @@ function UsersList(props){
               icon: 'add',
               tooltip: 'Add User',
               isFreeAction: true,
-              onClick: (event) => alert("You want to add a new row")
+              onClick: () => history.push('/add-user')
             },
             {
               icon: 'edit',
               tooltip: 'Edit User',
-              onClick: (event) => alert("You want to add a new row")
+              onClick: (event, rowData) => history.push(`/users/${rowData._id}`)
             }
           ]}
           columns={columns}

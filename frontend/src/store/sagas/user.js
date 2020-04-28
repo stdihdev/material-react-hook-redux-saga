@@ -1,7 +1,13 @@
 /* eslint-disable no-unused-vars */
 import { takeLatest } from 'redux-saga/effects';
-import { GET_USERS, POST_USER, PUT_USER, DELETE_USER } from '../constants';
+import { GET_USERS, POST_USER, PUT_USER, DELETE_USER, GET_USER } from '../constants';
 import apiCall from '../api/apiCall';
+
+const getUser = apiCall({
+  type: GET_USER,
+  method: 'get',
+  path: (payload) => `/users/${payload.id}/`
+});
 
 const getUsers = apiCall({
   type: GET_USERS,
@@ -32,4 +38,5 @@ export default function* rootSaga () {
   yield takeLatest(POST_USER, postUser);
   yield takeLatest(DELETE_USER, deleteUser);
   yield takeLatest(PUT_USER, putUser);
+  yield takeLatest(GET_USER, getUser);
 }
