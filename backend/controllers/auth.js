@@ -37,7 +37,7 @@ async function signUp(req, res, next) {
 
     //find an existing user
     let user = await User.findOne({email: req.body.email});
-    if (user) return res.status(400).send("User is already registered.");
+    if (user) return res.status(400).send("User already registered.");
 
     user = new User({
       firstName: req.body.firstName,

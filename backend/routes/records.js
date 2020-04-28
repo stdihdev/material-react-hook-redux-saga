@@ -1,10 +1,6 @@
 const express = require('express');
 const router = express.Router();
-// const Roles = require('../constants/role');
 const recordCtrl = require('../controllers/records');
-// const permissions = require('../helper/permissions');
-
-// router.use(permissions.isRole([Roles.ADMIN, Roles.USER]));
 
 // Get records listing and create one
 router.route('/')

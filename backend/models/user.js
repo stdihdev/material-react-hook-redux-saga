@@ -72,7 +72,16 @@ UserSchema.pre("save", function (next) {
 	} else {
 		next();
 	}
-})
+});
+
+UserSchema.pre("findOneAndUpdate", function (next) {
+	if(this.password && this.isModified('password')) {
+		this.password = this.encryptPassword(this.password);
+		next();
+	} else {
+		next();
+	}
+});
 
 const User = mongoose.model('User', UserSchema);
 
