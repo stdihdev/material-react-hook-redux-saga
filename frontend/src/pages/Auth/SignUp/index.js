@@ -55,6 +55,12 @@ const validate = values => {
       errors[field] = 'length must be between 3 and 50';
     }
   });
+  if(values.firstName && !/^[a-zA-Z]+$/.test(values.firstName)) {
+    errors.firstName = "First Name must be string.";
+  }
+  if(values.lastName && !/^[a-zA-Z]+$/.test(values.lastName)) {
+    errors.lastName = "Last Name must be string.";
+  }
   if (
     values.email &&
     !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)

@@ -19,7 +19,7 @@ import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';
 import Snack from '../../components/Snack';
 import { showSnack } from '../../store/reducers/snack';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 function Copyright() {
   return (
@@ -49,6 +49,12 @@ const validate = values => {
       errors[field] = 'length must be between 3 and 50';
     }
   });
+  if(values.firstName && !/^[a-zA-Z]+$/.test(values.firstName)) {
+    errors.firstName = "First Name must be string.";
+  }
+  if(values.lastName && !/^[a-zA-Z]+$/.test(values.lastName)) {
+    errors.lastName = "Last Name must be string.";
+  }
   if (values.role < '0' || values.role > '2' ) {
     errors.role = "Required";
   }
@@ -106,7 +112,6 @@ function UserEdit(props) {
     user,
     info
   } = props;
-  const history = useHistory();
   const params = useParams();
 
   useEffect(() => {
@@ -124,16 +129,16 @@ function UserEdit(props) {
   };
 
   const handleSubmit = (values, actions) => {
-    if(values.password === '********') {
-      delete values.password;
+    const body = { ...values };
+    if(body.password === '********') {
+      delete body.password;
     }
 
     params.id ? putUser({ 
       id: params.id,
-      body: values,
+      body: body,
       success: () => {
         actions.setSubmitting(false);
-        history.push('/users');
         showSnack({ message: "Successfuly Updated!", status: 'success' });
       },
       fail: (err) => {
@@ -141,10 +146,9 @@ function UserEdit(props) {
         showSnack({ message: err.response.data, status: 'error' });
       }
     }) : postUser({ 
-      body: values,
+      body: body,
       success: () => {
         actions.setSubmitting(false);
-        history.push('/users');
         showSnack({ message: "Successfuly Created!", status: 'success' });
       },
       fail: (err) => {

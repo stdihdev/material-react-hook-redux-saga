@@ -3,15 +3,18 @@ import MaterialTable from 'material-table';
 import Container from '@material-ui/core/Container';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
-import { getRecords, postRecord, putRecord, deleteRecord } from '../../store/reducers/record';
+import { getRecords, postRecord, putRecord, deleteRecord, exportRecords } from '../../store/reducers/record';
 import { showSnack } from '../../store/reducers/snack';
 import { compose } from 'redux';
 import { connect } from "react-redux";
+import Blob from 'blob';
+import FileSaver from 'file-saver';
 import PropTypes from 'prop-types';
 import PreferredHoursForm from '../../components/PreferredHoursForm';
 import Snack from '../../components/Snack';
 import ExportFilter from '../../components/ExportFilter';
 import Roles from '../../data/role';
+import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -35,7 +38,7 @@ const validate = values => {
       errors[field] = `${field} required.`;
     }
   });
-  if (values.hour < '1' || values.hour > '24' ) {
+  if (values.hour < 1 || values.hour > 24 ) {
     errors.hour = "hour sould be between 1 and 24.";
   }
 
@@ -52,7 +55,9 @@ function RecordsList(props){
     showSnack,
     putRecord,
     deleteRecord,
-    info
+    info,
+    exportRecords,
+    params
   } = props;
   const columns = [
     { title: 'No', render: rowData => rowData && rowData.tableData.id + 1, disableClick: true, editable: 'never' },
@@ -71,9 +76,68 @@ function RecordsList(props){
   };
 
   useEffect(() => {
-    getRecords();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    getRecords({ params });
+  }, [params]);
+
+  const exportRecordsInHtml = (records) => {
+    const fileName = "Time Records Export";
+    let captionText = '';
+    if(params.from && params.to) {
+      captionText = `Time Records from ${params.from} to ${params.to}`;
+    } else if(params.from) {
+      captionText = `Time Records from ${params.from}`;
+    } else if(params.to) {
+      captionText = `Time Records before ${params.to}`;
+    } else {
+      captionText = `All Time Records`;
+    }
+
+    let content = [`<style>
+      body {
+        text-align: center;
+      }
+      table {
+        margin: auto;
+        margin-top: 100px;
+        width: 80%;
+      }
+      table, th ,td {
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 5px;
+        text-align: left;
+      }
+      caption {
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+      </style>
+      <table>
+      <caption>${captionText}</caption>
+      <tr><th>No</th><th>Date</th><th>Total time</th><th>Notes</th></tr>`];
+    const recordContent = records.map((record, index) => {
+      const note = record.note.join('<br/>');
+      return `<tr>
+      <td style="width:20px">${index + 1}</td>
+      <td>${new Date(record._id).toLocaleDateString()}</td>
+      <td>${record.hour}</td>
+      <td>${note}</td></tr>`;
+    });
+    content = content.concat(recordContent, ['</table>']);
+    const blob = new Blob(content, { type: 'text/html' });
+    FileSaver.saveAs(blob, fileName);
+  };
+
+  const handleExportData = () => {
+    exportRecords({ 
+      params,
+      success: (res) => {
+        exportRecordsInHtml(res.data.records);
+      }
+    });
+  };
 
   const isUnderPreferredWorkingHours = ( date ) => {
     const recordsByDate = records.filter((record) => record.date === date);
@@ -97,12 +161,25 @@ function RecordsList(props){
     <Container component="main">
       <div className={classes.paper}>
         <Snack/>
-        {info && info.role <= 1 &&  <>
+        {info && info.role <= 1 &&
           <Button variant="contained" color="primary" onClick={handleOpenDialog} className={classes.button}>
             Set Preferred Working Hours
           </Button>
-          <ExportFilter/>
-        </>}
+        }
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={8}>
+            <ExportFilter/>
+          </Grid>
+          {info && info.role <= 1 &&
+            <Grid item xs={12} sm={4}>
+              <Button variant="contained" color="primary" className={classes.button} onClick={handleExportData}>
+                Export the filtered times
+              </Button>
+            </Grid>
+          }
+        </Grid>
+        
+        
         <MaterialTable
           title="Time Records"
           options={defaultOptions}
@@ -121,7 +198,7 @@ function RecordsList(props){
                   body: newData,
                   success: () => {
                     resolve();
-                    getRecords();
+                    getRecords({ params });
                     showSnack({ message: "Time Record created.", status: 'success' });
                   },
                   fail: (err) => {
@@ -148,7 +225,7 @@ function RecordsList(props){
                   },
                   success: () => {
                     resolve();
-                    getRecords();
+                    getRecords({ params });
                     showSnack({ message: "Time Record updated.", status: 'success' });
                   },
                   fail: (err) => {
@@ -189,11 +266,14 @@ RecordsList.propTypes = {
   deleteRecord: PropTypes.func.isRequired,
   records: PropTypes.array.isRequired,
   showSnack: PropTypes.func.isRequired,
+  params: PropTypes.object.isRequired,
+  exportRecords: PropTypes.func.isRequired,
   info: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
   records: state.record.records,
+  params: state.record.params,
   info: state.auth.me
 });
 
@@ -202,7 +282,8 @@ const mapDispatchToProps = {
   postRecord: postRecord,
   showSnack: showSnack,
   putRecord: putRecord,
-  deleteRecord: deleteRecord
+  deleteRecord: deleteRecord,
+  exportRecords: exportRecords
 };
 
 export default compose(

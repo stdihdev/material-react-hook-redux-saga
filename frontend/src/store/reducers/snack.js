@@ -15,8 +15,8 @@ export const showSnack = createAction(SHOW_SNACK);
 export default handleActions({
   [HIDE_SNACK]: (state) => ({
     ...state,
-    message: '',
-    show: false
+    show: false,
+    message: ''
   }),
 
   [SHOW_SNACK]: (state, { payload } = { duration: 2000 }) => ({

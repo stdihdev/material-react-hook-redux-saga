@@ -4,7 +4,7 @@ const Roles = require('../constants/role');
 const { canModifyRecord } = require('../helper/permissions');
 
 async function validateTotalHours(record) {
-  let where={date: record.date, _id: {$ne: record._id}};
+  let where={date: record.date, _id: {$ne: record._id}, user: record.user};
 
   const records = await Record.find(where);
   if(records.length) {
@@ -25,11 +25,19 @@ function read(req, res, next) {
 
 async function list(req, res, next) {
   try {
-    let where = {};
+    const { from, to } = req.query;
+    const where= {};
     if (req.user.role === Roles.USER || req.user.role === Roles.MANAGER) {
       where = {user: req.user._id};
     }
-
+    if(from && to)
+      where['date'] = { $gte: new Date(from), $lte: new Date(to) };
+    else if(from && !to)
+      where['date'] = { $gte: new Date(from) };
+    else if(!from && to)
+      where['date'] = { $lte: new Date(to) };
+    
+    console.log(where)
     const records = await Record
       .find(where)
       .populate('user', '-password')
@@ -67,14 +75,13 @@ async function update(req, res, next) {
     const { error } = validateUpdate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
     req.body.date = new Date(req.body.date).toLocaleDateString();
-    const record = new Record({...req.record._doc, ...req.body});
-    record._id = req.record._id;
+    Object.assign(req.record, req.body);
 
-    if(!await validateTotalHours(record)) {
+    if(!await validateTotalHours(req.record)) {
       return res.status(400).send("Worked more than 24hours!");
     }
 
-    const updatedRecord = await Record.findByIdAndUpdate(req.record._id, record, {upsert: true, useFindAndModify: false, new: true});
+    const updatedRecord = await await req.record.save();
     res.json(updatedRecord);
 
   } catch (error) {
@@ -118,18 +125,18 @@ async function exportRecords(req, res, next) {
       where['date'] = { $lte: new Date(to) };
     const records = await Record.aggregate([
       {
-        $sort: {"date": 1}
-      },
-      {
         $match: where
       },
       {
         $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+          _id: "$date",
           note: { $push: '$note' },
           hour: { $sum: '$hour' },
         },
-      }
+      },
+      {
+        $sort: {_id: 1}
+      },
     ]);
 
     res.json({records});
