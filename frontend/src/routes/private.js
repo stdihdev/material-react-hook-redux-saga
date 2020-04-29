@@ -9,14 +9,13 @@ function AdminOrManagerRoute({ children, ...rest }) {
   return (
     <Route
       {...rest}
-      render={({ location }) =>
+      render={() =>
         info.role >= ROLES.MANAGER ? (
           children
         ) : (
           <Redirect
             to={{
-              pathname: '/',
-              state: { from: location }
+              pathname: '/'
             }}
           />
         )

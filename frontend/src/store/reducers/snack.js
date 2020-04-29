@@ -4,7 +4,8 @@ import { HIDE_SNACK, SHOW_SNACK } from '../constants';
 const initialState = {
   message: '',
   show: false,
-  status: 'error'
+  status: 'error',
+  duration: 2000
 };
 
 export const hideSnack = createAction(HIDE_SNACK);
@@ -18,10 +19,9 @@ export default handleActions({
     show: false
   }),
 
-  [SHOW_SNACK]: (state, { payload }) => ({
+  [SHOW_SNACK]: (state, { payload } = { duration: 2000 }) => ({
     ...state,
-    message: payload.message,
-    show: true,
-    status: payload.status
+    ...payload,
+    show: true
   })
 }, initialState);

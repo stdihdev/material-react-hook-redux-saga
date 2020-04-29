@@ -10,15 +10,38 @@ import { connect } from "react-redux";
 import PropTypes from 'prop-types';
 import PreferredHoursForm from '../../components/PreferredHoursForm';
 import Snack from '../../components/Snack';
+import ExportFilter from '../../components/ExportFilter';
+import Roles from '../../data/role';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8)
   },
-  margin: {
+  button: {
     margin: theme.spacing(2, 0)
   }
 }));
+
+const validate = values => {
+  const errors = {};
+  const requiredFields = [
+    'date',
+    'note',
+    'hour'
+  ];
+
+  requiredFields.forEach(field => {
+    if (!values[field]) {
+      errors[field] = `${field} required.`;
+    }
+  });
+  if (values.hour < '1' || values.hour > '24' ) {
+    errors.hour = "hour sould be between 1 and 24.";
+  }
+
+  const message = Object.keys(errors).reduce((prev, cur) => (prev += ' ' + errors[cur]), '');
+  return message;
+};
 
 function RecordsList(props){
   const classes = useStyles();
@@ -33,7 +56,7 @@ function RecordsList(props){
   } = props;
   const columns = [
     { title: 'No', render: rowData => rowData && rowData.tableData.id + 1, disableClick: true, editable: 'never' },
-    { title: 'Date', field: 'date', type: 'date' },
+    { title: 'Date', field: 'date', type: 'date', defaultSort: 'desc' },
     { title: 'Note', field: 'note' },
     { title: 'Hour', field: 'hour', type: 'numeric' }
   ];
@@ -49,35 +72,56 @@ function RecordsList(props){
 
   useEffect(() => {
     getRecords();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const isUnderPreferredWorkingHours = ( date ) => {
+    const recordsByDate = records.filter((record) => record.date === date);
+    let totalHours = 0;
+    recordsByDate.forEach((record) => totalHours += record.hour);
+    return totalHours;
+  };
+
+  const defaultOptions = {
+    search: false,
+    actionsColumnIndex: -1,
+    pageSize: 10
+  };
+
+  if(info && info.role <= Roles.MANAGER)
+    defaultOptions.rowStyle = rowData => ({
+      backgroundColor: (isUnderPreferredWorkingHours(rowData.date) > info.preferredWorkingHours ? '#4caf50' : '#f44336')
+    });
 
   return (
     <Container component="main">
       <div className={classes.paper}>
         <Snack/>
-        <Button variant="contained" color="primary" onClick={handleOpenDialog} className={classes.margin}>
-          Set Preferred Working Hours
-        </Button>
+        {info && info.role <= 1 &&  <>
+          <Button variant="contained" color="primary" onClick={handleOpenDialog} className={classes.button}>
+            Set Preferred Working Hours
+          </Button>
+          <ExportFilter/>
+        </>}
         <MaterialTable
           title="Time Records"
-          options={
-            {
-              search: false,
-              actionsColumnIndex: -1,
-              rowStyle: rowData => ({
-                backgroundColor: (rowData.hour > info.preferredWorkingHours ? '#4caf50' : '#f44336')
-              })
-            }
-          }
+          options={defaultOptions}
           columns={columns}
           data={records}
           editable={{
             onRowAdd: (newData) => new Promise((resolve, reject) => {
+              const message = validate(newData);
+              if(message) {
+                reject();
+                showSnack({ message: message, status: 'error', duration: 6000 });
+                return;
+              }
               setTimeout(() => {
                 postRecord({
                   body: newData,
                   success: () => {
                     resolve();
+                    getRecords();
                     showSnack({ message: "Time Record created.", status: 'success' });
                   },
                   fail: (err) => {
@@ -87,27 +131,33 @@ function RecordsList(props){
                 });
               }, 600);
             }),
-            onRowUpdate: (newData) =>
-              new Promise((resolve, reject) => {
-                setTimeout(() => {
-                  putRecord({
-                    id: newData._id,
-                    body: {
-                      hour: newData.hour,
-                      note: newData.note,
-                      date: newData.date
-                    },
-                    success: () => {
-                      resolve();
-                      showSnack({ message: "Time Record updated.", status: 'success' });
-                    },
-                    fail: (err) => {
-                      reject();
-                      showSnack({ message: err.response.data, status: 'error' });
-                    }
-                  });
-                }, 600);
-              }),
+            onRowUpdate: (newData) => new Promise((resolve, reject) => {
+              const message = validate(newData);
+              if(message) {
+                reject();
+                showSnack({ message: message, status: 'error', duration: 6000 });
+                return;
+              }
+              setTimeout(() => {
+                putRecord({
+                  id: newData._id,
+                  body: {
+                    hour: newData.hour,
+                    note: newData.note,
+                    date: newData.date
+                  },
+                  success: () => {
+                    resolve();
+                    getRecords();
+                    showSnack({ message: "Time Record updated.", status: 'success' });
+                  },
+                  fail: (err) => {
+                    reject();
+                    showSnack({ message: err.response.data, status: 'error' });
+                  }
+                });
+              }, 600);
+            }),
             onRowDelete: (oldData) =>
               new Promise((resolve, reject) => {
                 setTimeout(() => {

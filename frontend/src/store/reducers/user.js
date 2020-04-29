@@ -6,9 +6,6 @@ const initialState = {
   users: [],
   user: null,
   params: {
-    count: 0,
-    limit: 10,
-    page: 1
   },
   error: ''
 };
@@ -25,10 +22,6 @@ export default handleActions({
   [Success(GET_USERS)]: (state, { payload }) => ({
     ...state,
     users: payload.users,
-    params: {
-      ...state.params,
-      ...payload.params
-    },
     error: null
   }),
   [Fail(GET_USERS)]: (state, { payload }) => ({
@@ -76,7 +69,6 @@ export default handleActions({
   },
   [Success(DELETE_USER)]: (state, { payload }) => {
     const updatedUsers = state.users.filter((user) => user._id !== payload.id);
-    console.log(updatedUsers, payload)
     return ({
       ...state,
       users: updatedUsers,

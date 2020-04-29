@@ -13,7 +13,7 @@ function Alert(props) {
 function Snack(props) {
   const { snack, hideSnack } = props;
   return (
-    <Snackbar open={snack.show} autoHideDuration={2000} onClose={() => hideSnack()}>
+    <Snackbar open={snack.show} autoHideDuration={snack.duration} onClose={() => hideSnack()}>
       <Alert  severity={snack.status}>
         {snack.message}
       </Alert>

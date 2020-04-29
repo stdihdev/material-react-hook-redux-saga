@@ -112,6 +112,7 @@ function UserEdit(props) {
   useEffect(() => {
     if(params.id)
       getUser(({ id: params.id }));
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id]);
 
   const initialValues = {
