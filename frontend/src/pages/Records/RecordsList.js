@@ -152,10 +152,13 @@ function RecordsList(props){
     pageSize: 10
   };
 
-  if(info && info.role <= Roles.MANAGER)
+  if(info && info.role <= Roles.MANAGER) {
     defaultOptions.rowStyle = rowData => ({
       backgroundColor: (isUnderPreferredWorkingHours(rowData.date) > info.preferredWorkingHours ? '#4caf50' : '#f44336')
     });
+  } else {
+    columns.push({ title: 'User Name', render: rowData => rowData && `${rowData.user.firstName} ${rowData.user.lastName}`, disableClick: true, editable: 'never' });
+  }
 
   return (
     <Container component="main">
