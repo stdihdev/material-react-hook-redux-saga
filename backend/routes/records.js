@@ -7,13 +7,15 @@ router.route('/')
   .get(recordCtrl.list)
   .post(recordCtrl.create);
 
+// export html
+router.route('/export')
+  .get(recordCtrl.exportRecords);
+
 // get, update, remove a record by id.
 router.route('/:id')
   .get(recordCtrl.read)
   .put(recordCtrl.update)
   .delete(recordCtrl.remove);
-
-// export html
 
 // get record by id.
 router.param('id', recordCtrl.getRecordById);

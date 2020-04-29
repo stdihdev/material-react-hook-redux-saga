@@ -14,8 +14,8 @@ const RecordSchema = new mongoose.Schema({
 	},
 	hour: {
     type: Number,
-    default: 0,
-    min: [0, 'Hour should be begger than 0hr'],
+    default: 1,
+    min: [1, 'Hour should be begger than 0hr'],
     max: [24, 'Hour should be less than 24hr'],
 
   },
@@ -28,7 +28,7 @@ const RecordSchema = new mongoose.Schema({
 const validateRecord = (record) => {
 	const schema = {
     date: Joi.date().required().default(Date.now()),
-    hour: Joi.number().required().min(0).max(24).default(0),
+    hour: Joi.number().required().min(1).max(24).default(0),
     note: Joi.string().optional().default('')
 	};
 
@@ -38,7 +38,7 @@ const validateRecord = (record) => {
 const validateUpdateRecord = (record) => {
 	const schema = {
     date: Joi.date().optional(),
-    hour: Joi.number().optional().min(0).max(24),
+    hour: Joi.number().optional().min(1).max(24),
     note: Joi.string().optional(),
 	};
 

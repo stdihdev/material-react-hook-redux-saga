@@ -6,12 +6,13 @@ function read(req, res, next) {
 
 async function list(req, res, next) {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    // const { page = 1, limit = 10 } = req.query;
 
-    const users = await User.find({_id: {$ne: req.user._id}, role: {$lte: req.user.role }}).limit(limit).skip((page - 1) * limit).select('-');
-    const count = await User.countDocuments();
+    // const users = await User.find({_id: {$ne: req.user._id}, role: {$lte: req.user.role }}).limit(limit).skip((page - 1) * limit).select('-');
+    const users = await User.find({_id: {$ne: req.user._id}, role: {$lte: req.user.role }}).select('-password');
+    // const count = await User.countDocuments();
 
-    res.json({users, params: {limit, page, count}});
+    res.json({users});
 
   } catch (error) {
     next(error);
