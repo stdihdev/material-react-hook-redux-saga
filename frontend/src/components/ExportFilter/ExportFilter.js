@@ -54,6 +54,7 @@ function ExportFilter(props) {
           format="MM/dd/yyyy"
           margin="normal"
           id="date-picker-from"
+          maxDate={params.to}
           value={params.from}
           onChange={handleFromDateChange}
           KeyboardButtonProps={{
@@ -79,6 +80,7 @@ function ExportFilter(props) {
           format="MM/dd/yyyy"
           margin="normal"
           id="date-picker-to"
+          minDate={params.from}
           value={params.to}
           onChange={handleToDateChange}
           KeyboardButtonProps={{

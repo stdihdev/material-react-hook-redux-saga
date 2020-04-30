@@ -19,6 +19,11 @@ import Grid from '@material-ui/core/Grid';
 import TablePagination from '@material-ui/core/TablePagination';
 import UserAsyncSelector from '../../components/UserAsyncSelector';
 import { getFullName } from '../../lib/lib';
+import DateFnsUtils from '@date-io/date-fns';
+import {
+  MuiPickersUtilsProvider,
+  DatePicker
+} from '@material-ui/pickers';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -72,7 +77,24 @@ function RecordsList(props){
   const columns = [
     { title: 'No', render: rowData => rowData && rowData.tableData.id + 1 + params.page * params.rowsPerPage, disableClick: true, editable: 'never' },
     // eslint-disable-next-line react/display-name
-    { title: 'Date', field: 'date', type: 'date', defaultSort: 'desc' },
+    { title: 'Date', field: 'date', type: 'date', defaultSort: 'desc', editComponent: props => (
+      <MuiPickersUtilsProvider utils={DateFnsUtils}
+        locale={props.dateTimePickerLocalization}>
+        <DatePicker
+          format="dd.MM.yyyy"
+          value={props.value || null}
+          onChange={(date) => props.onChange(date)}
+          clearable
+          placeholder="Date"
+          maxDate={new Date()}
+          InputProps={{
+            style: {
+              fontSize: 13
+            }
+          }}
+        />
+      </MuiPickersUtilsProvider>
+    ) },
     { title: 'Note', field: 'note' },
     // eslint-disable-next-line react/display-name
     { title: 'Hour', field: 'hour', type: 'numeric', editComponent: props => (
