@@ -1,8 +1,9 @@
 import 'date-fns';
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
+import ClearIcon from "@material-ui/icons/Clear";
+import { IconButton } from "@material-ui/core";
 import DateFnsUtils from '@date-io/date-fns';
-
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker
@@ -41,25 +42,43 @@ function ExportFilter(props) {
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
       <Grid container justify="space-around">
         <KeyboardDatePicker
-          disableToolbar
-          variant="inline"
+          InputProps={{
+            endAdornment: (
+              <IconButton onClick={() => handleFromDateChange(null)}>
+                <ClearIcon />
+              </IconButton>
+            )
+          }}
+          clearable
+          placeholder="From"
           format="MM/dd/yyyy"
           margin="normal"
           id="date-picker-from"
-          label="From"
           value={params.from}
           onChange={handleFromDateChange}
           KeyboardButtonProps={{
             'aria-label': 'change date'
           }}
+          InputAdornmentProps={{
+            position: "start"
+          }}
         />
         <KeyboardDatePicker
-          disableToolbar
-          variant="inline"
+          InputProps={{
+            endAdornment: (
+              <IconButton onClick={() => handleToDateChange(null)}>
+                <ClearIcon />
+              </IconButton>
+            )
+          }}
+          InputAdornmentProps={{
+            position: "start"
+          }}
+          placeholder="To"
+          clearable
           format="MM/dd/yyyy"
           margin="normal"
           id="date-picker-to"
-          label="To"
           value={params.to}
           onChange={handleToDateChange}
           KeyboardButtonProps={{

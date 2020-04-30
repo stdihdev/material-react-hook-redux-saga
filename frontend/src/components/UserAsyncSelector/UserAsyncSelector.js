@@ -14,10 +14,10 @@ function AsyncUserSelector(props) {
 
   React.useEffect(() => {
     if (!loading) {
-      return undefined;
+      return;
     }
     getUsers();
-  }, [loading]);
+  }, [loading, getUsers]);
 
   return (
     <Autocomplete
@@ -32,7 +32,7 @@ function AsyncUserSelector(props) {
       value={value}
       onChange={onChange}
       getOptionSelected={(option, value) => value && option._id === value._id}
-      getOptionLabel={(option) => option.email ? option.email : ''}
+      getOptionLabel={(option) => option.firstName ? `${option.firstName} ${option.lastName}` : ''}
       options={users}
       loading={loading}
       renderInput={(params) => (

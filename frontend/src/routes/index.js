@@ -19,7 +19,7 @@ const Routes = () => {
       }} />
       <Route path='/login' component={SignIn} />
       <Route path='/signup' component={SignUp} />
-      {isAuthenticated && <>
+      {isAuthenticated && <Switch>
         <Route exact path="/records" component={RecordsList}/>
         <AdminOrManagerRoute exact path="/users">
           <UsersList/>
@@ -30,7 +30,7 @@ const Routes = () => {
         <AdminOrManagerRoute exact path="/users/:id">
           <UserEdit/>
         </AdminOrManagerRoute>
-      </>}
+      </Switch>}
       <Route render={() => <Redirect to="/" />} />
     </Switch>
   );

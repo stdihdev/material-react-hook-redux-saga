@@ -53,8 +53,7 @@ function UsersList(props){
 
   useEffect(() => {
     getUsers({ params });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
+  }, [params, getUsers]);
 
   const handleChangePage = (event, newPage) => {
     setParams({ page: newPage });

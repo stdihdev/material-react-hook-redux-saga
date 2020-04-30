@@ -75,7 +75,7 @@ function RecordsList(props){
     // eslint-disable-next-line react/display-name
     { title: 'Hour', field: 'hour', type: 'numeric', editComponent: props => (
       <TextField
-        placeholder='hour'
+        placeholder='Hour'
         type='number'
         fullWidth
         inputProps={{
@@ -93,8 +93,8 @@ function RecordsList(props){
     {
       hidden: info.role <= Roles.MANAGER ? true : false,
       editable: 'always',
-      title: 'User Email',
-      render: rowData => rowData && rowData.user && `${rowData.user.email}`,
+      title: 'User',
+      render: rowData => rowData && rowData.user && `${rowData.user.firstName} ${rowData.user.lastName}`,
       field: 'user',
       initialEditValue: info.role <= Roles.MANAGER ? info : {},
       // eslint-disable-next-line react/display-name
@@ -122,8 +122,7 @@ function RecordsList(props){
 
   useEffect(() => {
     getRecords({ params });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
+  }, [params, getRecords]);
 
   const exportRecordsInHtml = (records) => {
     const fileName = "Time Records Export";
