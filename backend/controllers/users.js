@@ -9,10 +9,20 @@ async function list(req, res, next) {
     // const { page = 1, limit = 10 } = req.query;
 
     // const users = await User.find({_id: {$ne: req.user._id}, role: {$lte: req.user.role }}).limit(limit).skip((page - 1) * limit).select('-');
-    const users = await User.find({_id: {$ne: req.user._id}, role: {$lte: req.user.role }}).select('-password');
+    // const users = await User.find({_id: {$ne: req.user._id}, role: {$lte: req.user.role }}).select('-password');
     // const count = await User.countDocuments();
+    const { page = 0, rowsPerPage = 10} = req.query;
+    const where= {_id: {$ne: req.user._id}, role: {$lte: req.user.role }};
 
-    res.json({users});
+
+    const users = await User
+      .find(where)
+      .skip(page * rowsPerPage)
+      .limit(parseInt(rowsPerPage))
+      .select('-password');
+    const count = await User.countDocuments(where);
+
+    res.json({users, count});
 
   } catch (error) {
     next(error);

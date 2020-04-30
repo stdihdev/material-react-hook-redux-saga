@@ -6,7 +6,10 @@ const initialState = {
   records: [],
   record: null,
   exportResults: [],
+  count: 0,
   params: {
+    page: 0,
+    rowsPerPage: 10,
     from: null,
     to: null
   },
@@ -33,6 +36,7 @@ export default handleActions({
   [Success(GET_RECORDS)]: (state, { payload }) => ({
     ...state,
     records: payload.records,
+    count: payload.count,
     error: null
   }),
   [Fail(GET_RECORDS)]: (state, { payload }) => ({
@@ -79,6 +83,7 @@ export default handleActions({
     return ({
       ...state,
       records: updatedRecords,
+      count: state.count - 1,
       error: null
     });
   },

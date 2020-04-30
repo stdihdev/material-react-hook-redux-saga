@@ -3,7 +3,7 @@ import MaterialTable from 'material-table';
 import Container from '@material-ui/core/Container';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
-import { getRecords, postRecord, putRecord, deleteRecord, exportRecords } from '../../store/reducers/record';
+import { getRecords, postRecord, putRecord, deleteRecord, exportRecords, setParams } from '../../store/reducers/record';
 import { showSnack } from '../../store/reducers/snack';
 import { compose } from 'redux';
 import { connect } from "react-redux";
@@ -15,6 +15,7 @@ import Snack from '../../components/Snack';
 import ExportFilter from '../../components/ExportFilter';
 import Roles from '../../data/role';
 import Grid from '@material-ui/core/Grid';
+import TablePagination from '@material-ui/core/TablePagination';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -57,10 +58,12 @@ function RecordsList(props){
     deleteRecord,
     info,
     exportRecords,
-    params
+    setParams,
+    params,
+    count
   } = props;
   const columns = [
-    { title: 'No', render: rowData => rowData && rowData.tableData.id + 1, disableClick: true, editable: 'never' },
+    { title: 'No', render: rowData => rowData && rowData.tableData.id + 1 + params.page * params.rowsPerPage, disableClick: true, editable: 'never' },
     { title: 'Date', field: 'date', type: 'date', defaultSort: 'desc' },
     { title: 'Note', field: 'note' },
     { title: 'Hour', field: 'hour', type: 'numeric' }
@@ -148,9 +151,9 @@ function RecordsList(props){
 
   const defaultOptions = {
     search: false,
-    actionsColumnIndex: -1,
-    pageSize: 10
+    actionsColumnIndex: -1
   };
+  defaultOptions.pageSize = params.rowsPerPage;
 
   if(info && info.role <= Roles.MANAGER) {
     defaultOptions.rowStyle = rowData => ({
@@ -160,6 +163,14 @@ function RecordsList(props){
     columns.push({ title: 'User Name', render: rowData => rowData && `${rowData.user.firstName} ${rowData.user.lastName}`, disableClick: true, editable: 'never' });
   }
 
+  const handleChangePage = (event, newPage) => {
+    setParams({ page: newPage });
+  };
+
+  const handleChangeRowsPerPage = (event, callBack) => {
+    setParams({ rowsPerPage: parseInt(event.target.value, 10), page: 0 });
+    callBack(event);
+  };
   return (
     <Container component="main">
       <div className={classes.paper}>
@@ -188,6 +199,29 @@ function RecordsList(props){
           options={defaultOptions}
           columns={columns}
           data={records}
+          components={{
+            // eslint-disable-next-line react/display-name
+            Pagination: props => {
+              return (
+                <TablePagination
+                  {...props}
+                  count={count}
+                  rowsPerPage={params.rowsPerPage}   
+                  page={params.page}
+                  onChangePage={handleChangePage}
+                  onChangeRowsPerPage={
+                    // eslint-disable-next-line react/prop-types
+                    (event) => handleChangeRowsPerPage(event, props.onChangeRowsPerPage)
+                  }
+                />
+              );
+            }
+          }}
+          localization={{
+            pagination: {
+              labelDisplayedRows: `${params.page * params.rowsPerPage + 1}-${Math.min((params.page + 1) * params.rowsPerPage, count)} of ${count}`
+            }
+          }}
           editable={{
             onRowAdd: (newData) => new Promise((resolve, reject) => {
               const message = validate(newData);
@@ -269,14 +303,17 @@ RecordsList.propTypes = {
   deleteRecord: PropTypes.func.isRequired,
   records: PropTypes.array.isRequired,
   showSnack: PropTypes.func.isRequired,
+  setParams: PropTypes.func.isRequired,
   params: PropTypes.object.isRequired,
   exportRecords: PropTypes.func.isRequired,
+  count: PropTypes.number.isRequired,
   info: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
   records: state.record.records,
   params: state.record.params,
+  count: state.record.count,
   info: state.auth.me
 });
 
@@ -286,7 +323,8 @@ const mapDispatchToProps = {
   showSnack: showSnack,
   putRecord: putRecord,
   deleteRecord: deleteRecord,
-  exportRecords: exportRecords
+  exportRecords: exportRecords,
+  setParams: setParams
 };
 
 export default compose(

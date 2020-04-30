@@ -7,13 +7,13 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker
 } from '@material-ui/pickers';
-import { setParams, getRecords } from '../../store/reducers/record';
+import { setParams } from '../../store/reducers/record';
 import { compose } from 'redux';
 import { connect } from "react-redux";
 import PropTypes from 'prop-types';
 
 function ExportFilter(props) {
-  const { params, setParams, getRecords } = props;
+  const { params, setParams } = props;
   // The first commit of Material-UI
   // const [selectedDate, setSelectedDate] = React.useState(new Date('2014-08-18T21:11:54'));
 
@@ -74,8 +74,7 @@ function ExportFilter(props) {
 
 ExportFilter.propTypes = {
   setParams: PropTypes.func.isRequired,
-  params: PropTypes.object.isRequired,
-  getRecords: PropTypes.func.isRequired
+  params: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -83,8 +82,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  setParams: setParams,
-  getRecords: getRecords
+  setParams: setParams
 };
 
 export default compose(

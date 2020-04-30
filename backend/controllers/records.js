@@ -25,7 +25,7 @@ function read(req, res, next) {
 
 async function list(req, res, next) {
   try {
-    const { from, to } = req.query;
+    const { from, to, page = 0, rowsPerPage = 10} = req.query;
     const where= {};
     if (req.user.role === Roles.USER || req.user.role === Roles.MANAGER) {
       where = {user: req.user._id};
@@ -36,14 +36,16 @@ async function list(req, res, next) {
       where['date'] = { $gte: new Date(from) };
     else if(!from && to)
       where['date'] = { $lte: new Date(to) };
-    
-    console.log(where)
+
     const records = await Record
       .find(where)
+      .skip(page * rowsPerPage)
+      .limit(parseInt(rowsPerPage))
       .populate('user', '-password')
       .sort('-date');
+    const count = await Record.countDocuments(where);
 
-    res.json({records});
+    res.json({records, count});
 
   } catch (error) {
     next(error);
