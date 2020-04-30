@@ -6,6 +6,7 @@ import { compose } from 'redux';
 import { connect } from "react-redux";
 import { getUsers } from '../../store/reducers/user';
 import PropTypes from 'prop-types';
+import { getFullName } from '../../lib/lib';
 
 function AsyncUserSelector(props) {
   const [open, setOpen] = React.useState(false);
@@ -32,7 +33,7 @@ function AsyncUserSelector(props) {
       value={value}
       onChange={onChange}
       getOptionSelected={(option, value) => value && option._id === value._id}
-      getOptionLabel={(option) => option.firstName ? `${option.firstName} ${option.lastName}` : ''}
+      getOptionLabel={(option) => option.firstName ? getFullName(option) : ''}
       options={users}
       loading={loading}
       renderInput={(params) => (

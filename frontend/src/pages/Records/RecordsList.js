@@ -18,6 +18,7 @@ import Roles from '../../data/role';
 import Grid from '@material-ui/core/Grid';
 import TablePagination from '@material-ui/core/TablePagination';
 import UserAsyncSelector from '../../components/UserAsyncSelector';
+import { getFullName } from '../../lib/lib';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -70,6 +71,7 @@ function RecordsList(props){
   } = props;
   const columns = [
     { title: 'No', render: rowData => rowData && rowData.tableData.id + 1 + params.page * params.rowsPerPage, disableClick: true, editable: 'never' },
+    // eslint-disable-next-line react/display-name
     { title: 'Date', field: 'date', type: 'date', defaultSort: 'desc' },
     { title: 'Note', field: 'note' },
     // eslint-disable-next-line react/display-name
@@ -94,7 +96,9 @@ function RecordsList(props){
       hidden: info.role <= Roles.MANAGER ? true : false,
       editable: 'always',
       title: 'User',
-      render: rowData => rowData && rowData.user && `${rowData.user.firstName} ${rowData.user.lastName}`,
+      customSort: (a, b) => (getFullName(a.user)
+        .localeCompare(getFullName(b.user))),
+      render: rowData => rowData && rowData.user && getFullName(rowData.user),
       field: 'user',
       initialEditValue: info.role <= Roles.MANAGER ? info : {},
       // eslint-disable-next-line react/display-name
