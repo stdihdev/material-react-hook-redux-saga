@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import MaterialTable from 'material-table';
 import Container from '@material-ui/core/Container';
+import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 import { getRecords, postRecord, putRecord, deleteRecord, exportRecords, setParams } from '../../store/reducers/record';
@@ -16,6 +17,7 @@ import ExportFilter from '../../components/ExportFilter';
 import Roles from '../../data/role';
 import Grid from '@material-ui/core/Grid';
 import TablePagination from '@material-ui/core/TablePagination';
+import UserAsyncSelector from '../../components/UserAsyncSelector';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -26,14 +28,13 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const validate = values => {
+const validate = (values, role) => {
   const errors = {};
   const requiredFields = [
     'date',
     'note',
     'hour'
   ];
-
   requiredFields.forEach(field => {
     if (!values[field]) {
       errors[field] = `${field} required.`;
@@ -42,7 +43,12 @@ const validate = values => {
   if (values.hour < 1 || values.hour > 24 ) {
     errors.hour = "hour sould be between 1 and 24.";
   }
-
+  if (role === Roles.ADMIN && values.user && !values.user._id) {
+    errors.user = `user required.`;
+  }
+  if (role === Roles.ADMIN && !values.user) {
+    errors.user = `user required.`;
+  }
   const message = Object.keys(errors).reduce((prev, cur) => (prev += ' ' + errors[cur]), '');
   return message;
 };
@@ -66,7 +72,43 @@ function RecordsList(props){
     { title: 'No', render: rowData => rowData && rowData.tableData.id + 1 + params.page * params.rowsPerPage, disableClick: true, editable: 'never' },
     { title: 'Date', field: 'date', type: 'date', defaultSort: 'desc' },
     { title: 'Note', field: 'note' },
-    { title: 'Hour', field: 'hour', type: 'numeric' }
+    // eslint-disable-next-line react/display-name
+    { title: 'Hour', field: 'hour', type: 'numeric', editComponent: props => (
+      <TextField
+        placeholder='hour'
+        type='number'
+        fullWidth
+        inputProps={{
+          min: 1,
+          max:24,
+          step: 1,
+          style: { fontSize: 13 }
+        }}
+        // eslint-disable-next-line react/prop-types
+        value={props.value ? props.value : ''}
+        // eslint-disable-next-line react/prop-types
+        onChange={e => props.onChange(e.target.value)}
+      />
+    ) },
+    {
+      hidden: info.role <= Roles.MANAGER ? true : false,
+      editable: 'always',
+      title: 'User Email',
+      render: rowData => rowData && rowData.user && `${rowData.user.email}`,
+      field: 'user',
+      initialEditValue: info.role <= Roles.MANAGER ? info : {},
+      // eslint-disable-next-line react/display-name
+      editComponent: props => {
+        return (
+          <UserAsyncSelector
+            // eslint-disable-next-line react/prop-types
+            value={props.value}
+            // eslint-disable-next-line react/prop-types
+            onChange={(e, value) => props.onChange(value)}
+          />
+        );
+      }
+    }
   ];
   const [open, setOpen] = useState(false);
 
@@ -149,19 +191,16 @@ function RecordsList(props){
     recordsByDate.forEach((record) => totalHours += record.hour);
     return totalHours;
   };
-
   const defaultOptions = {
     search: false,
-    actionsColumnIndex: -1
+    actionsColumnIndex: -1,
+    pageSize: params.rowsPerPage
   };
-  defaultOptions.pageSize = params.rowsPerPage;
 
   if(info && info.role <= Roles.MANAGER) {
     defaultOptions.rowStyle = rowData => ({
       backgroundColor: (isUnderPreferredWorkingHours(rowData.date) > info.preferredWorkingHours ? '#4caf50' : '#f44336')
     });
-  } else {
-    columns.push({ title: 'User Name', render: rowData => rowData && rowData.user && `${rowData.user.firstName} ${rowData.user.lastName}`, disableClick: true, editable: 'never' });
   }
 
   const handleChangePage = (event, newPage) => {
@@ -194,8 +233,6 @@ function RecordsList(props){
             </Grid>
           }
         </Grid>
-        
-        
         <MaterialTable
           title="Time Records"
           options={defaultOptions}
@@ -226,7 +263,7 @@ function RecordsList(props){
           }}
           editable={{
             onRowAdd: (newData) => new Promise((resolve, reject) => {
-              const message = validate(newData);
+              const message = validate(newData, info.role);
               if(message) {
                 reject();
                 showSnack({ message: message, status: 'error', duration: 6000 });
@@ -234,7 +271,12 @@ function RecordsList(props){
               }
               setTimeout(() => {
                 postRecord({
-                  body: newData,
+                  body: {
+                    hour: newData.hour,
+                    note: newData.note,
+                    date: newData.date,
+                    user: newData.user ? newData.user._id : null
+                  },
                   success: () => {
                     resolve();
                     getRecords({ params });
@@ -247,33 +289,36 @@ function RecordsList(props){
                 });
               }, 600);
             }),
-            onRowUpdate: (newData) => new Promise((resolve, reject) => {
-              const message = validate(newData);
-              if(message) {
-                reject();
-                showSnack({ message: message, status: 'error', duration: 6000 });
-                return;
-              }
-              setTimeout(() => {
-                putRecord({
-                  id: newData._id,
-                  body: {
-                    hour: newData.hour,
-                    note: newData.note,
-                    date: newData.date
-                  },
-                  success: () => {
-                    resolve();
-                    getRecords({ params });
-                    showSnack({ message: "Time Record updated.", status: 'success' });
-                  },
-                  fail: (err) => {
-                    reject();
-                    showSnack({ message: err.response.data, status: 'error' });
-                  }
-                });
-              }, 600);
-            }),
+            onRowUpdate: (newData) => {
+              return new Promise((resolve, reject) => {
+                const message = validate(newData, info.role);
+                if(message) {
+                  reject();
+                  showSnack({ message: message, status: 'error', duration: 6000 });
+                  return;
+                }
+                setTimeout(() => {
+                  putRecord({
+                    id: newData._id,
+                    body: {
+                      hour: newData.hour,
+                      note: newData.note,
+                      date: newData.date,
+                      user: newData.user._id
+                    },
+                    success: () => {
+                      resolve();
+                      getRecords({ params });
+                      showSnack({ message: "Time Record updated.", status: 'success' });
+                    },
+                    fail: (err) => {
+                      reject();
+                      showSnack({ message: err.response.data, status: 'error' });
+                    }
+                  });
+                }, 600);
+              });
+            },
             onRowDelete: (oldData) =>
               new Promise((resolve, reject) => {
                 setTimeout(() => {

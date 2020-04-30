@@ -54,11 +54,14 @@ async function list(req, res, next) {
 
 async function create(req, res, next) {
   try {
+    if(req.user.role < Roles.ADMIN) {
+      req.body.user = req.user._id;
+    }
+
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
     req.body.date = new Date(req.body.date).toLocaleDateString();
     const record = new Record(req.body);
-    record.user = req.user._id;
   
     if(!await validateTotalHours(record)) {
       return res.status(400).send("Worked more than 24hours!");
@@ -74,10 +77,15 @@ async function create(req, res, next) {
 
 async function update(req, res, next) {
   try {
+    if(req.user.role < Roles.ADMIN) {
+      req.body.user = req.user._id;
+    }
     const { error } = validateUpdate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
     req.body.date = new Date(req.body.date).toLocaleDateString();
     Object.assign(req.record, req.body);
+
+    
 
     if(!await validateTotalHours(req.record)) {
       return res.status(400).send("Worked more than 24hours!");

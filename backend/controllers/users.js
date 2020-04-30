@@ -1,5 +1,5 @@
 const { User, validate, validateUpdate } = require("../models/user");
-
+const { Record } = require('../models/record');
 function read(req, res, next) {
   res.json(req.userModel);
 }
@@ -61,6 +61,7 @@ async function update(req, res, next) {
 }
 
 async function remove(req, res, next) {
+  await Record.remove({user: req.userModel._id})
   await req.userModel.remove();
   res.json({id: req.userModel._id});
 }

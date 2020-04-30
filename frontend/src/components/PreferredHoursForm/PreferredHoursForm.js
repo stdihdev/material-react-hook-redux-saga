@@ -84,6 +84,7 @@ function PreferredHoursForm(props) {
                   component={TextField}
                   name="preferredWorkingHours"
                   type="number"
+                  inputProps={{ min: 1, max:24, step: 1 }}
                   value={values.preferredWorkingHours}
                   label="Preferred Working Hours"
                 />

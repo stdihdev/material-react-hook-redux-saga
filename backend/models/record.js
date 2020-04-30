@@ -29,7 +29,8 @@ const validateRecord = (record) => {
 	const schema = {
     date: Joi.date().required().default(Date.now()),
     hour: Joi.number().required().min(1).max(24).default(0),
-    note: Joi.string().optional().default('')
+    note: Joi.string().optional().default(''),
+    user: Joi.objectId().required(),
 	};
 
 	return Joi.validate(record, schema);
@@ -40,6 +41,7 @@ const validateUpdateRecord = (record) => {
     date: Joi.date().optional(),
     hour: Joi.number().optional().min(1).max(24),
     note: Joi.string().optional(),
+    user: Joi.objectId().required(),
 	};
 
 	return Joi.validate(record, schema);
