@@ -10,6 +10,7 @@ export const signup = createAction(SIGNUP);
 export const setHours = createAction(SET_HOURS);
 export const signout = createAction(SIGNIN, () => {
   localStorage.removeItem('time_management_info');
+  window.location.href = '/login';
 });
 
 const getInitialState = () => {

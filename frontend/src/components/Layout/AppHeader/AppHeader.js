@@ -58,7 +58,11 @@ function AppHeader(props) {
                 <Button color="inherit">Records</Button>
               </NavLink>
               }
-              <NavLink className={classes.navLink} activeClassName={classes.active} to="/logout" onClick={signout} >
+              <NavLink
+                className={classes.navLink}
+                activeClassName={classes.active}
+                to="/logout"
+                onClick={signout} >
                 <Button color="inherit">Log Out</Button>
               </NavLink>
             </>
