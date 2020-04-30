@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import MaterialTable from 'material-table';
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
-import { getUsers, postUser, putUser, deleteUser } from '../../store/reducers/user';
+import { getUsers, deleteUser, setParams } from '../../store/reducers/user';
 import { showSnack } from '../../store/reducers/snack';
 import { compose } from 'redux';
 import { connect } from "react-redux";
@@ -10,6 +10,7 @@ import PropTypes from 'prop-types';
 import Snack from '../../components/Snack';
 import ROLES from '../../data/role';
 import { useHistory } from 'react-router-dom';
+import TablePagination from '@material-ui/core/TablePagination';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -27,10 +28,13 @@ function UsersList(props){
     users,
     showSnack,
     info,
-    deleteUser
+    deleteUser,
+    setParams,
+    params,
+    count
   } = props;
   const columns = [
-    { title: 'No', render: rowData => rowData && rowData.tableData.id + 1, disableClick: true, editable: 'never' },
+    { title: 'No', render: rowData => rowData && rowData.tableData.id + 1 + params.page * params.rowsPerPage, disableClick: true, editable: 'never' },
     { title: 'Name', render: rowData => rowData && rowData.firstName + ' ' + rowData.lastName },
     { title: 'Email', field: 'email' },
     { title: 'Role',
@@ -48,9 +52,18 @@ function UsersList(props){
   const history = useHistory();
 
   useEffect(() => {
-    getUsers();
+    getUsers({ params });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [params]);
+
+  const handleChangePage = (event, newPage) => {
+    setParams({ page: newPage });
+  };
+
+  const handleChangeRowsPerPage = (event, callBack) => {
+    setParams({ rowsPerPage: parseInt(event.target.value, 10), page: 0 });
+    callBack(event);
+  };
 
   return (
     <Container component="main">
@@ -61,7 +74,8 @@ function UsersList(props){
           options={
             {
               search: false,
-              actionsColumnIndex: -1
+              actionsColumnIndex: -1,
+              pageSize: params.rowsPerPage
             }
           }
           actions={[
@@ -79,6 +93,29 @@ function UsersList(props){
           ]}
           columns={columns}
           data={users}
+          components={{
+            // eslint-disable-next-line react/display-name
+            Pagination: props => {
+              return (
+                <TablePagination
+                  {...props}
+                  count={count}
+                  rowsPerPage={params.rowsPerPage}
+                  page={params.page}
+                  onChangePage={handleChangePage}
+                  onChangeRowsPerPage={
+                    // eslint-disable-next-line react/prop-types
+                    (event) => handleChangeRowsPerPage(event, props.onChangeRowsPerPage)
+                  }
+                />
+              );
+            }
+          }}
+          localization={{
+            pagination: {
+              labelDisplayedRows: `${params.page * params.rowsPerPage + 1}-${Math.min((params.page + 1) * params.rowsPerPage, count)} of ${count}`
+            }
+          }}
           editable={{
             onRowDelete: (oldData) =>
               new Promise((resolve, reject) => {
@@ -87,6 +124,7 @@ function UsersList(props){
                     id: oldData._id,
                     success: () => {
                       resolve();
+                      getUsers({ params });
                       showSnack({ message: "User removed.", status: 'success' });
                     },
                     fail: (err) => {
@@ -105,24 +143,26 @@ function UsersList(props){
 
 UsersList.propTypes = {
   getUsers: PropTypes.func.isRequired,
-  postUser: PropTypes.func.isRequired,
-  putUser: PropTypes.func.isRequired,
   deleteUser: PropTypes.func.isRequired,
+  setParams: PropTypes.func.isRequired,
   users: PropTypes.array.isRequired,
   showSnack: PropTypes.func.isRequired,
+  params: PropTypes.object.isRequired,
+  count: PropTypes.number.isRequired,
   info: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
   users: state.user.users,
-  info: state.auth.me
+  info: state.auth.me,
+  params: state.user.params,
+  count: state.user.count
 });
 
 const mapDispatchToProps = {
   getUsers: getUsers,
-  postUser: postUser,
+  setParams: setParams,
   showSnack: showSnack,
-  putUser: putUser,
   deleteUser: deleteUser
 };
 

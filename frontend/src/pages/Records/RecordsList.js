@@ -80,6 +80,7 @@ function RecordsList(props){
 
   useEffect(() => {
     getRecords({ params });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 
   const exportRecordsInHtml = (records) => {
@@ -160,7 +161,7 @@ function RecordsList(props){
       backgroundColor: (isUnderPreferredWorkingHours(rowData.date) > info.preferredWorkingHours ? '#4caf50' : '#f44336')
     });
   } else {
-    columns.push({ title: 'User Name', render: rowData => rowData && `${rowData.user.firstName} ${rowData.user.lastName}`, disableClick: true, editable: 'never' });
+    columns.push({ title: 'User Name', render: rowData => rowData && rowData.user && `${rowData.user.firstName} ${rowData.user.lastName}`, disableClick: true, editable: 'never' });
   }
 
   const handleChangePage = (event, newPage) => {
@@ -171,6 +172,7 @@ function RecordsList(props){
     setParams({ rowsPerPage: parseInt(event.target.value, 10), page: 0 });
     callBack(event);
   };
+
   return (
     <Container component="main">
       <div className={classes.paper}>
@@ -206,7 +208,7 @@ function RecordsList(props){
                 <TablePagination
                   {...props}
                   count={count}
-                  rowsPerPage={params.rowsPerPage}   
+                  rowsPerPage={params.rowsPerPage}
                   page={params.page}
                   onChangePage={handleChangePage}
                   onChangeRowsPerPage={
@@ -279,6 +281,7 @@ function RecordsList(props){
                     id: oldData._id,
                     success: () => {
                       resolve();
+                      getRecords({ params });
                       showSnack({ message: "Time Record removed.", status: 'success' });
                     },
                     fail: (err) => {

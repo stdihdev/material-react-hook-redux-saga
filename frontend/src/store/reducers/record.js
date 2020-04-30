@@ -1,6 +1,6 @@
 import { createAction, handleActions } from 'redux-actions';
 import { Success, Fail } from '../api/status';
-import { GET_RECORDS, POST_RECORD, PUT_RECORD, DELETE_RECORD, SET_PARAMS, EXPORT_RECORDS } from '../constants';
+import { GET_RECORDS, POST_RECORD, PUT_RECORD, DELETE_RECORD, SET_RECORD_PARAMS, EXPORT_RECORDS } from '../constants';
 
 const initialState = {
   records: [],
@@ -21,12 +21,12 @@ export const getRecords = createAction(GET_RECORDS);
 export const postRecord = createAction(POST_RECORD);
 export const putRecord = createAction(PUT_RECORD);
 export const deleteRecord = createAction(DELETE_RECORD);
-export const setParams = createAction(SET_PARAMS);
+export const setParams = createAction(SET_RECORD_PARAMS);
 export const exportRecords = createAction(EXPORT_RECORDS);
 
 // Reducer
 export default handleActions({
-  [SET_PARAMS] : (state, { payload }) => ({
+  [SET_RECORD_PARAMS] : (state, { payload }) => ({
     ...state,
     params: {
       ...state.params,
@@ -78,11 +78,9 @@ export default handleActions({
       error: payload.data
     });
   },
-  [Success(DELETE_RECORD)]: (state, { payload }) => {
-    const updatedRecords = state.records.filter((record) => record._id !== payload.id);
+  [Success(DELETE_RECORD)]: (state) => {
     return ({
       ...state,
-      records: updatedRecords,
       count: state.count - 1,
       error: null
     });

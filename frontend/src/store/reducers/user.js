@@ -1,11 +1,14 @@
 import { createAction, handleActions } from 'redux-actions';
 import { Success, Fail } from '../api/status';
-import { GET_USERS, POST_USER, PUT_USER, DELETE_USER, GET_USER } from '../constants';
+import { GET_USERS, POST_USER, PUT_USER, DELETE_USER, GET_USER, SET_USER_PARAMS } from '../constants';
 
 const initialState = {
   users: [],
   user: null,
+  count: 0,
   params: {
+    page: 0,
+    rowsPerPage: 10
   },
   error: ''
 };
@@ -16,12 +19,21 @@ export const postUser = createAction(POST_USER);
 export const putUser = createAction(PUT_USER);
 export const deleteUser = createAction(DELETE_USER);
 export const getUser = createAction(GET_USER);
+export const setParams = createAction(SET_USER_PARAMS);
 
 // Reducer
 export default handleActions({
+  [SET_USER_PARAMS] : (state, { payload }) => ({
+    ...state,
+    params: {
+      ...state.params,
+      ...payload
+    }
+  }),
   [Success(GET_USERS)]: (state, { payload }) => ({
     ...state,
     users: payload.users,
+    count: payload.count,
     error: null
   }),
   [Fail(GET_USERS)]: (state, { payload }) => ({
@@ -30,7 +42,6 @@ export default handleActions({
   }),
   [Success(POST_USER)]: (state, { payload }) => ({
     ...state,
-    users: [...state.users, payload],
     user: payload,
     error: null
   }),
@@ -67,11 +78,9 @@ export default handleActions({
       error: payload.data
     });
   },
-  [Success(DELETE_USER)]: (state, { payload }) => {
-    const updatedUsers = state.users.filter((user) => user._id !== payload.id);
+  [Success(DELETE_USER)]: (state) => {
     return ({
       ...state,
-      users: updatedUsers,
       error: null
     });
   },
