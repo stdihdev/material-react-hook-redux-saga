@@ -1,5 +1,7 @@
 const { User, validate, validateUpdate } = require("../models/user");
 const { Record } = require('../models/record');
+const { canModifyUser } = require('../helper/permissions');
+
 function read(req, res, next) {
   res.json(req.userModel);
 }
@@ -71,7 +73,11 @@ async function getUserById(req, res, next, id) {
     const user = await User.findById(id);
   
     if(!user) {
-      return res.status(404).send('Record not found');
+      return res.status(404).send('User not found');
+    }
+
+    if(!canModifyUser(req.user, user)) {
+      return res.status(403).send('You are not authorized.')
     }
 
     req.userModel = user;

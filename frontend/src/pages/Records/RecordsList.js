@@ -91,29 +91,34 @@ function RecordsList(props){
         // eslint-disable-next-line react/prop-types
         onChange={e => props.onChange(e.target.value)}
       />
-    ) },
-    {
-      hidden: info.role <= Roles.MANAGER ? true : false,
-      editable: 'always',
-      title: 'User',
-      customSort: (a, b) => (getFullName(a.user)
-        .localeCompare(getFullName(b.user))),
-      render: rowData => rowData && rowData.user && getFullName(rowData.user),
-      field: 'user',
-      initialEditValue: info.role <= Roles.MANAGER ? info : {},
-      // eslint-disable-next-line react/display-name
-      editComponent: props => {
-        return (
-          <UserAsyncSelector
-            // eslint-disable-next-line react/prop-types
-            value={props.value}
-            // eslint-disable-next-line react/prop-types
-            onChange={(e, value) => props.onChange(value)}
-          />
-        );
-      }
-    }
+    ) }
   ];
+
+  if(info.role === Roles.ADMIN) {
+    columns.push(
+      {
+        hidden: info.role <= Roles.MANAGER ? true : false,
+        editable: 'always',
+        title: 'User',
+        customSort: (a, b) => (getFullName(a.user)
+          .localeCompare(getFullName(b.user))),
+        render: rowData => rowData && rowData.user && getFullName(rowData.user),
+        field: 'user',
+        initialEditValue: info.role <= Roles.MANAGER ? info : {},
+        // eslint-disable-next-line react/display-name
+        editComponent: props => {
+          return (
+            <UserAsyncSelector
+              // eslint-disable-next-line react/prop-types
+              value={props.value}
+              // eslint-disable-next-line react/prop-types
+              onChange={(e, value) => props.onChange(value)}
+            />
+          );
+        }
+      }
+    );
+  }
   const [open, setOpen] = useState(false);
 
   const handleOpenDialog = () => {

@@ -88,7 +88,7 @@ async function update(req, res, next) {
     
 
     if(!await validateTotalHours(req.record)) {
-      return res.status(400).send("Worked more than 24hours!");
+      return res.status(400).send("Couldn't work more than 24 hours a day.");
     }
 
     const updatedRecord = await await req.record.save();
@@ -111,7 +111,6 @@ async function getRecordById(req, res, next, id) {
     if(!record) {
       return res.status(404).send('Record not found');
     }
-
     if(!canModifyRecord(req.user, record)) {
       return res.status(403).send('You are not authorized.')
     }

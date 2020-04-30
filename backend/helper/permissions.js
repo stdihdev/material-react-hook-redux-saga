@@ -11,16 +11,22 @@ function isRole(roles) {
   };
 }
 
-function canModifyRecord(user, record) {
-  return () => {
-    if(user.role === Roles.ADMIN || user._id === record.user.toString()) {
-      return true;
-    }
-    return false;
+function canModifyUser(user, modifyUser) {
+  if(modifyUser.role <= user.role) {
+    return true;
   }
+  return false;
+}
+
+function canModifyRecord(user, record) {
+  if(user.role === Roles.ADMIN || user._id === record.user.toString()) {
+    return true;
+  }
+  return false;
 }
 
 module.exports = {
   isRole,
   canModifyRecord,
+  canModifyUser
 };
