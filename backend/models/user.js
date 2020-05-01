@@ -81,7 +81,7 @@ const validateUser = (user) => {
 		lastName: Joi.string().min(3).max(50).required(),
     email: Joi.string().min(5).max(50).required().email(),
 		password: Joi.string().min(3).max(50).required(),
-		role: Joi.number().integer().optional().allow([...Object.values(ROLES), null]).default(ROLES.USER),
+		role: Joi.number().integer().optional().min(0).max(2).default(ROLES.USER),
 		preferredWorkingHours: Joi.number().optional().min(1).max(24).default(8)
 	};
 
@@ -94,7 +94,7 @@ const validateUpdateUser = (user) => {
 		lastName: Joi.string().min(3).max(50).optional(),
     email: Joi.string().min(5).max(50).optional().email(),
 		password: Joi.string().min(3).max(50).optional(),
-		role: Joi.number().integer().optional().allow([...Object.values(ROLES), null]).default(ROLES.USER),
+		role: Joi.number().integer().optional().min(0).max(2).default(ROLES.USER),
 		preferredWorkingHours: Joi.number().optional().min(1).max(24).default(8)
 	};
 

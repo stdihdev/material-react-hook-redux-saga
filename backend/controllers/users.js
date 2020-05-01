@@ -1,6 +1,7 @@
 const { User, validate, validateUpdate } = require("../models/user");
 const { Record } = require('../models/record');
 const { canModifyUser } = require('../helper/permissions');
+const Roles = require('../constants/role');
 
 function read(req, res, next) {
   res.json(req.userModel);
@@ -33,6 +34,10 @@ async function create(req, res, next) {
 
     let exist = await User.findOne({email: req.body.email});
     if (exist) return res.status(400).send("User already registered.");
+
+    if(req.user.role === Roles.MANAGER && req.body.role === Roles.ADMIN){
+      return res.status(403).send("Permission denied. You are not able to create admin role.");
+    }
   
     const user = new User(req.body);
     const newUser = await user.save();
@@ -48,8 +53,11 @@ async function update(req, res, next) {
     const { error } = validateUpdate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
-    if(req.user.role === "manager" && req.body.role === "admin"){
-      return res.status(403).send("Permission denied");
+    let exist = await User.findOne({email: req.body.email, _id: { $ne: req.userModel._id}});
+    if (exist) return res.status(400).send("User already registered.");
+
+    if(req.user.role === Roles.MANAGER && req.body.role === Roles.ADMIN){
+      return res.status(403).send("Permission denied. You are not able to read/edit admin role.");
     }
 
     Object.assign(req.userModel, req.body);
@@ -77,7 +85,7 @@ async function getUserById(req, res, next, id) {
     }
 
     if(!canModifyUser(req.user, user)) {
-      return res.status(403).send('You are not authorized.')
+      return res.status(403).send('Permission denied. You are not able to read/edit this user.')
     }
 
     req.userModel = user;

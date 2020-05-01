@@ -112,7 +112,7 @@ async function getRecordById(req, res, next, id) {
       return res.status(404).send('Record not found');
     }
     if(!canModifyRecord(req.user, record)) {
-      return res.status(403).send('You are not authorized.')
+      return res.status(403).send('Permission denied. You are not able to read/edit this record.')
     }
 
     req.record = record;
