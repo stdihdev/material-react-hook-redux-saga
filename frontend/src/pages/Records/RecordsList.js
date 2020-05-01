@@ -81,7 +81,7 @@ function RecordsList(props){
       <MuiPickersUtilsProvider utils={DateFnsUtils}
         locale={props.dateTimePickerLocalization}>
         <DatePicker
-          format="dd.MM.yyyy"
+          format="MM/dd/yyyy"
           value={props.value || null}
           onChange={(date) => props.onChange(date)}
           clearable
@@ -255,13 +255,11 @@ function RecordsList(props){
           <Grid item xs={12} sm={8}>
             <ExportFilter/>
           </Grid>
-          {info && info.role <= 1 &&
-            <Grid item xs={12} sm={4}>
-              <Button variant="contained" color="primary" className={classes.button} onClick={handleExportData}>
-                Export the filtered times
-              </Button>
-            </Grid>
-          }
+          <Grid item xs={12} sm={4}>
+            <Button variant="contained" color="primary" className={classes.button} onClick={handleExportData}>
+              Export the filtered times
+            </Button>
+          </Grid>
         </Grid>
         <MaterialTable
           title="Time Records"

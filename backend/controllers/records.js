@@ -64,7 +64,7 @@ async function create(req, res, next) {
     const record = new Record(req.body);
   
     if(!await validateTotalHours(record)) {
-      return res.status(400).send("Worked more than 24hours!");
+      return res.status(400).send("Couldn't work more than 24 hours a day.");
     }
 
     const newRecord = await record.save();
@@ -125,13 +125,16 @@ async function getRecordById(req, res, next, id) {
 async function exportRecords(req, res, next) {
   try {
     const { from, to } = req.query;
-    let where = {user: ObjectId(req.user._id)};
+    let where={};
+    if(req.user.role < Roles.ADMIN)
+      where = {user: ObjectId(req.user._id)};
     if(from && to)
       where['date'] = { $gte: new Date(from), $lte: new Date(to) };
     else if(from && !to)
       where['date'] = { $gte: new Date(from) };
     else if(!from && to)
       where['date'] = { $lte: new Date(to) };
+
     const records = await Record.aggregate([
       {
         $match: where

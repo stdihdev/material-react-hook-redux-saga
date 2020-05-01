@@ -19,7 +19,7 @@ function ExportFilter(props) {
   // const [selectedDate, setSelectedDate] = React.useState(new Date('2014-08-18T21:11:54'));
 
   const handleFromDateChange = (date) => {
-    if(!date) { 
+    if(!date || date instanceof Date === false) {
       setParams({ from: null });
     } else if(date > new Date(params.to) && params.to) {
       setParams({ from: date.toLocaleDateString(), to: null });
@@ -29,7 +29,7 @@ function ExportFilter(props) {
   };
 
   const handleToDateChange = (date) => {
-    if(!date) {
+    if(!date || date instanceof Date === false) {
       setParams({ to: null });
     } else if(date < new Date(params.from) && params.from) {
       setParams({ to: date.toLocaleDateString(), from: null });
@@ -50,11 +50,12 @@ function ExportFilter(props) {
             )
           }}
           clearable
-          placeholder="From"
+          label="From"
           format="MM/dd/yyyy"
+          placeholder="mm/dd/yyy"
           margin="normal"
           id="date-picker-from"
-          maxDate={params.to}
+          maxDate={params.to ? params.to : new Date()}
           value={params.from}
           onChange={handleFromDateChange}
           KeyboardButtonProps={{
@@ -75,12 +76,14 @@ function ExportFilter(props) {
           InputAdornmentProps={{
             position: "start"
           }}
-          placeholder="To"
+          label="To"
+          placeholder="mm/dd/yyy"
           clearable
           format="MM/dd/yyyy"
           margin="normal"
           id="date-picker-to"
-          minDate={params.from}
+          minDate={params.from ? params.from : new Date(1900,1,1)}
+          maxDate={new Date()}
           value={params.to}
           onChange={handleToDateChange}
           KeyboardButtonProps={{
