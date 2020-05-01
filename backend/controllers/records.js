@@ -25,7 +25,7 @@ function read(req, res, next) {
 
 async function list(req, res, next) {
   try {
-    const { from, to, page = 0, rowsPerPage = 10} = req.query;
+    const { from, to, page = 0, rowsPerPage = 10, user} = req.query;
     let where= {};
     if (req.user.role === Roles.USER || req.user.role === Roles.MANAGER) {
       where = {user: req.user._id};
@@ -36,6 +36,10 @@ async function list(req, res, next) {
       where['date'] = { $gte: new Date(from) };
     else if(!from && to)
       where['date'] = { $lte: new Date(to) };
+
+    if(user && req.user.role === Roles.ADMIN) {
+      where['user'] = ObjectId(user);
+    }
 
     const records = await Record
       .find(where)
@@ -124,10 +128,15 @@ async function getRecordById(req, res, next, id) {
 
 async function exportRecords(req, res, next) {
   try {
-    const { from, to } = req.query;
+    const { from, to, user } = req.query;
     let where={};
     if(req.user.role < Roles.ADMIN)
       where = {user: ObjectId(req.user._id)};
+
+    if(user && req.user.role === Roles.ADMIN) {
+      where['user'] = ObjectId(user);
+    }
+
     if(from && to)
       where['date'] = { $gte: new Date(from), $lte: new Date(to) };
     else if(from && !to)

@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8)
   },
-  button: {
+  margin: {
     margin: theme.spacing(2, 0)
   }
 }));
@@ -224,7 +224,8 @@ function RecordsList(props){
   const defaultOptions = {
     search: false,
     actionsColumnIndex: -1,
-    pageSize: params.rowsPerPage
+    pageSize: params.rowsPerPage,
+    sorting: false
   };
 
   if(info && info.role <= Roles.MANAGER) {
@@ -247,16 +248,16 @@ function RecordsList(props){
       <div className={classes.paper}>
         <Snack/>
         {info && info.role <= 1 &&
-          <Button variant="contained" color="primary" onClick={handleOpenDialog} className={classes.button}>
+          <Button variant="contained" color="primary" onClick={handleOpenDialog} className={classes.margin}>
             Set Preferred Working Hours
           </Button>
         }
-        <Grid container spacing={2}>
+        <Grid container spacing={2} alignItems='flex-end' className={classes.margin}>
           <Grid item xs={12} sm={8}>
-            <ExportFilter/>
+            <ExportFilter allowUser={info.role === Roles.ADMIN}/>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <Button variant="contained" color="primary" className={classes.button} onClick={handleExportData}>
+            <Button variant="contained" color="primary" onClick={handleExportData}>
               Export the filtered times
             </Button>
           </Grid>

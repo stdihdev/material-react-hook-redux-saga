@@ -11,7 +11,8 @@ const initialState = {
     page: 0,
     rowsPerPage: 10,
     from: null,
-    to: null
+    to: null,
+    user: null
   },
   error: ''
 };

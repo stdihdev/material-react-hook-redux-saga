@@ -12,11 +12,14 @@ import { setParams } from '../../store/reducers/record';
 import { compose } from 'redux';
 import { connect } from "react-redux";
 import PropTypes from 'prop-types';
+import UserAsyncSelector from '../UserAsyncSelector';
 
 function ExportFilter(props) {
-  const { params, setParams } = props;
-  // The first commit of Material-UI
-  // const [selectedDate, setSelectedDate] = React.useState(new Date('2014-08-18T21:11:54'));
+  const { params, setParams, allowUser } = props;
+
+  const handleToUserChange = (e, value) => {
+    setParams({ user: value ? value._id : null });
+  };
 
   const handleFromDateChange = (date) => {
     if(!date || date instanceof Date === false) {
@@ -40,56 +43,65 @@ function ExportFilter(props) {
 
   return (
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
-      <Grid container justify="space-around">
-        <KeyboardDatePicker
-          InputProps={{
-            endAdornment: (
-              <IconButton onClick={() => handleFromDateChange(null)}>
-                <ClearIcon />
-              </IconButton>
-            )
-          }}
-          clearable
-          label="From"
-          format="MM/dd/yyyy"
-          placeholder="mm/dd/yyy"
-          margin="normal"
-          id="date-picker-from"
-          maxDate={params.to ? params.to : new Date()}
-          value={params.from}
-          onChange={handleFromDateChange}
-          KeyboardButtonProps={{
-            'aria-label': 'change date'
-          }}
-          InputAdornmentProps={{
-            position: "start"
-          }}
-        />
-        <KeyboardDatePicker
-          InputProps={{
-            endAdornment: (
-              <IconButton onClick={() => handleToDateChange(null)}>
-                <ClearIcon />
-              </IconButton>
-            )
-          }}
-          InputAdornmentProps={{
-            position: "start"
-          }}
-          label="To"
-          placeholder="mm/dd/yyy"
-          clearable
-          format="MM/dd/yyyy"
-          margin="normal"
-          id="date-picker-to"
-          minDate={params.from ? params.from : new Date(1900,1,1)}
-          maxDate={new Date()}
-          value={params.to}
-          onChange={handleToDateChange}
-          KeyboardButtonProps={{
-            'aria-label': 'change date'
-          }}
-        />
+      <Grid container justify="space-around" spacing={2} alignItems='flex-end'>
+        <Grid item xs={12} sm={4}>
+          <KeyboardDatePicker
+            InputProps={{
+              endAdornment: (
+                <IconButton onClick={() => handleFromDateChange(null)}>
+                  <ClearIcon />
+                </IconButton>
+              )
+            }}
+            clearable
+            label="From"
+            format="MM/dd/yyyy"
+            placeholder="mm/dd/yyy"
+            id="date-picker-from"
+            maxDate={params.to ? params.to : new Date()}
+            value={params.from}
+            onChange={handleFromDateChange}
+            KeyboardButtonProps={{
+              'aria-label': 'change date'
+            }}
+            InputAdornmentProps={{
+              position: "start"
+            }}
+          />
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <KeyboardDatePicker
+            InputProps={{
+              endAdornment: (
+                <IconButton onClick={() => handleToDateChange(null)}>
+                  <ClearIcon />
+                </IconButton>
+              )
+            }}
+            InputAdornmentProps={{
+              position: "start"
+            }}
+            label="To"
+            placeholder="mm/dd/yyy"
+            clearable
+            format="MM/dd/yyyy"
+            id="date-picker-to"
+            minDate={params.from ? params.from : new Date(1900, 1, 1)}
+            maxDate={new Date()}
+            value={params.to}
+            onChange={handleToDateChange}
+            KeyboardButtonProps={{
+              'aria-label': 'change date'
+            }}
+          />
+        </Grid>
+        {allowUser &&
+        <Grid item xs={12} sm={4}>
+          <UserAsyncSelector
+            label="User"
+            margin="normal"
+            onChange={handleToUserChange}/>
+        </Grid>}
       </Grid>
     </MuiPickersUtilsProvider>
   );
@@ -98,7 +110,12 @@ function ExportFilter(props) {
 
 ExportFilter.propTypes = {
   setParams: PropTypes.func.isRequired,
-  params: PropTypes.object.isRequired
+  params: PropTypes.object.isRequired,
+  allowUser: PropTypes.bool
+};
+
+ExportFilter.defaultProps = {
+  allowUser: false
 };
 
 const mapStateToProps = state => ({

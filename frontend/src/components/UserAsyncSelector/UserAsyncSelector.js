@@ -39,7 +39,7 @@ function AsyncUserSelector(props) {
       renderInput={(params) => (
         <TextField
           {...params}
-          placeholder="user"
+          placeholder="User"
           InputProps={{
             ...params.InputProps,
             endAdornment: (
