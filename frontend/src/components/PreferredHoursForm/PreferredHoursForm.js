@@ -55,7 +55,7 @@ function PreferredHoursForm(props) {
       success: () => {
         actions.setSubmitting(false);
         handleClose();
-        showSnack({ message: "Successfuly Updated.", status: 'success' });
+        showSnack({ message: "Successfully Updated.", status: 'success' });
       },
       fail: (err) => {
         actions.setSubmitting(false);

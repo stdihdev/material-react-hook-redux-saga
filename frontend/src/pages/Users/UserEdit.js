@@ -47,7 +47,7 @@ const validate = values => {
     if (!values[field]) {
       errors[field] = 'Required';
     } else if((values[field].length < 3 || values[field].length > 50)) {
-      errors[field] = 'length must be between 3 and 50';
+      errors[field] = 'Length must be between 3 and 50';
     }
   });
   if(values.firstName && !/^[a-zA-Z]+$/.test(values.firstName)) {
@@ -129,7 +129,7 @@ function UserEdit(props) {
     email: params.id && user ? user.email : '',
     password: params.id && user ? '********' : '',
     role: params.id && user ? user.role : '',
-    preferredWorkingHours: info ? info.preferredWorkingHours : ''
+    preferredWorkingHours: params.id && user ? user.preferredWorkingHours : ''
   };
 
   const handleSubmit = (values, actions) => {
@@ -143,7 +143,7 @@ function UserEdit(props) {
       body: body,
       success: () => {
         actions.setSubmitting(false);
-        showSnack({ message: "Successfuly Updated!", status: 'success' });
+        showSnack({ message: "Successfully Updated!", status: 'success' });
       },
       fail: (err) => {
         actions.setSubmitting(false);
@@ -153,7 +153,7 @@ function UserEdit(props) {
       body: body,
       success: () => {
         actions.setSubmitting(false);
-        showSnack({ message: "Successfuly Created!", status: 'success' });
+        showSnack({ message: "Successfully Created!", status: 'success' });
       },
       fail: (err) => {
         actions.setSubmitting(false);

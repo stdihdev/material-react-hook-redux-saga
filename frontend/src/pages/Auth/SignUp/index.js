@@ -52,7 +52,7 @@ const validate = values => {
     if (!values[field]) {
       errors[field] = 'Required';
     } else if(values[field].length < 3 || values[field].length > 50 ) {
-      errors[field] = 'length must be between 3 and 50';
+      errors[field] = 'Length must be between 3 and 50';
     }
   });
   if(values.firstName && !/^[a-zA-Z]+$/.test(values.firstName)) {
@@ -101,7 +101,7 @@ function SignUp(props) {
       success: () => {
         actions.setSubmitting(false);
         history.push('/login');
-        showSnack({ message: "Successfuly Signed Up!", status: 'success' });
+        showSnack({ message: "Successfully Signed Up!", status: 'success' });
       },
       fail: (err) => {
         actions.setSubmitting(false);

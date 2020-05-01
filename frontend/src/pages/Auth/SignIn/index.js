@@ -35,7 +35,7 @@ const validate = values => {
     if (!values[field]) {
       errors[field] = 'Required';
     } else if(values[field].length < 3 || values[field].length > 50 ) {
-      errors[field] = 'length must be between 3 and 50';
+      errors[field] = 'Length must be between 3 and 50';
     }
   });
   if (
@@ -91,7 +91,7 @@ function SignIn(props) {
       success: () => {
         actions.setSubmitting(false);
         history.push('/');
-        showSnack({ message: "Successfuly Logged in!", status: 'success' });
+        showSnack({ message: "Successfully Logged in!", status: 'success' });
       },
       fail: (err) => {
         actions.setSubmitting(false);

@@ -25,9 +25,9 @@ function ExportFilter(props) {
     if(!date || date instanceof Date === false) {
       setParams({ from: null });
     } else if(date > new Date(params.to) && params.to) {
-      setParams({ from: date.toLocaleDateString(), to: null });
+      setParams({ from: new Date(date.toDateString()), to: null });
     } else {
-      setParams({ from: date.toLocaleDateString() });
+      setParams({ from: new Date(date.toDateString()) });
     }
   };
 
@@ -35,9 +35,9 @@ function ExportFilter(props) {
     if(!date || date instanceof Date === false) {
       setParams({ to: null });
     } else if(date < new Date(params.from) && params.from) {
-      setParams({ to: date.toLocaleDateString(), from: null });
+      setParams({ to: new Date(date.toDateString()), from: null });
     } else {
-      setParams({ to: date.toLocaleDateString() });
+      setParams({ to: new Date(date.toDateString()) });
     }
   };
 
@@ -55,8 +55,8 @@ function ExportFilter(props) {
             }}
             clearable
             label="From"
-            format="MM/dd/yyyy"
-            placeholder="mm/dd/yyy"
+            format="dd/MM/yyyy"
+            placeholder="dd/mm/yyyy"
             id="date-picker-from"
             maxDate={params.to ? params.to : new Date()}
             value={params.from}
@@ -82,9 +82,9 @@ function ExportFilter(props) {
               position: "start"
             }}
             label="To"
-            placeholder="mm/dd/yyy"
+            placeholder="dd/mm/yyyy"
             clearable
-            format="MM/dd/yyyy"
+            format="dd/MM/yyyy"
             id="date-picker-to"
             minDate={params.from ? params.from : new Date(1900, 1, 1)}
             maxDate={new Date()}

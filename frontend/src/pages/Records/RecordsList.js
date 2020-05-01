@@ -43,17 +43,17 @@ const validate = (values, role) => {
   ];
   requiredFields.forEach(field => {
     if (!values[field]) {
-      errors[field] = `${field} required.`;
+      errors[field] = `${field.charAt(0).toUpperCase(0) + field.slice(1)} required.`;
     }
   });
   if (values.hour < 1 || values.hour > 24 ) {
-    errors.hour = "hour sould be between 1 and 24.";
+    errors.hour = "Hour sould be between 1 and 24.";
   }
   if (role === Roles.ADMIN && values.user && !values.user._id) {
-    errors.user = `user required.`;
+    errors.user = `User required.`;
   }
   if (role === Roles.ADMIN && !values.user) {
-    errors.user = `user required.`;
+    errors.user = `User required.`;
   }
   const message = Object.keys(errors).reduce((prev, cur) => (prev += ' ' + errors[cur]), '');
   return message;
@@ -159,11 +159,11 @@ function RecordsList(props){
     const fileName = "Time Records Export";
     let captionText = '';
     if(params.from && params.to) {
-      captionText = `Time Records from ${params.from} to ${params.to}`;
+      captionText = `Time Records from ${params.from.toLocaleDateString()} to ${params.to.toLocaleDateString()}`;
     } else if(params.from) {
-      captionText = `Time Records from ${params.from}`;
+      captionText = `Time Records from ${params.from.toLocaleDateString()}`;
     } else if(params.to) {
-      captionText = `Time Records before ${params.to}`;
+      captionText = `Time Records before ${params.to.toLocaleDateString()}`;
     } else {
       captionText = `All Time Records`;
     }
