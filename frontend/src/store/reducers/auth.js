@@ -1,13 +1,13 @@
 /* eslint-disable no-unused-vars */
 import { createAction, handleActions } from 'redux-actions';
 import { Success, Fail } from '../api/status';
-import { SIGNIN, SIGNOUT, SIGNUP, SET_HOURS } from '../constants';
+import { SIGNIN, SIGNOUT, SIGNUP, UPDATE_PROFILE } from '../constants';
 
 // Actions
 
 export const signin = createAction(SIGNIN);
 export const signup = createAction(SIGNUP);
-export const setHours = createAction(SET_HOURS);
+export const updateProfile = createAction(UPDATE_PROFILE);
 export const signout = createAction(SIGNIN, () => {
   localStorage.removeItem('time_management_info');
   window.location.href = '/login';
@@ -59,14 +59,14 @@ export default handleActions({
     error: payload
   }),
 
-  [Success(SET_HOURS)]: (state, { payload }) => ({
+  [Success(UPDATE_PROFILE)]: (state, { payload }) => ({
     ...state,
     token: payload.token,
     status:'SUCCESS',
     me: payload.info
   }),
 
-  [Fail(SET_HOURS)]: (state, { payload }) => ({
+  [Fail(UPDATE_PROFILE)]: (state, { payload }) => ({
     ...state,
     status: 'FAIL',
     error: payload

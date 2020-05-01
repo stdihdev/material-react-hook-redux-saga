@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { takeLatest } from 'redux-saga/effects';
-import { SIGNIN, SIGNUP, SET_HOURS } from '../constants';
+import { SIGNIN, SIGNUP, UPDATE_PROFILE } from '../constants';
 import apiCall from '../api/apiCall';
 
 const signin = apiCall({
@@ -21,10 +21,10 @@ const signup = apiCall({
   }
 });
 
-const setHours = apiCall({
-  type: SET_HOURS,
+const updateProfile = apiCall({
+  type: UPDATE_PROFILE,
   method: 'post',
-  path: () => '/auth/updateHours/',
+  path: () => '/auth/update/',
   success: (res, action) => {
     localStorage.setItem('time_management_info', JSON.stringify(res.data));
   }
@@ -33,5 +33,5 @@ const setHours = apiCall({
 export default function* rootSaga () {
   yield takeLatest(SIGNIN, signin);
   yield takeLatest(SIGNUP, signup);
-  yield takeLatest(SET_HOURS, setHours);
+  yield takeLatest(UPDATE_PROFILE, updateProfile);
 }

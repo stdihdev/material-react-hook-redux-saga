@@ -9,7 +9,7 @@ router.route('/login')
 router.route('/signup')
   .post(authCtrl.signUp);
 // User update Preferred Working Hours
-router.route('/updateHours')
-  .post(authMiddleware, authCtrl.updateHours);
+router.route('/update')
+  .post(authMiddleware, authCtrl.updateProfile);
 
 module.exports = router;

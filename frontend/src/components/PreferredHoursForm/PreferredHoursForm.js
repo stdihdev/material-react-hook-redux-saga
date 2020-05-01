@@ -10,7 +10,7 @@ import { Formik, Form, Field } from 'formik';
 import Grid from '@material-ui/core/Grid';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import { setHours } from '../../store/reducers/auth';
+import { updateProfile } from '../../store/reducers/auth';
 import { connect } from "react-redux";
 import { compose } from 'redux';
 import { showSnack } from '../../store/reducers/snack';
@@ -44,13 +44,13 @@ const validate = values => {
 };
 
 function PreferredHoursForm(props) {
-  const { open, handleClose, showSnack, setHours, info } = props;
+  const { open, handleClose, showSnack, updateProfile, info } = props;
   const classes = useStyles();
   const initialValues = {
     preferredWorkingHours: info.preferredWorkingHours
   };
   const handleSubmit = (values, actions) => {
-    setHours({ 
+    updateProfile({ 
       body: values,
       success: () => {
         actions.setSubmitting(false);
@@ -128,7 +128,7 @@ PreferredHoursForm.propTypes = {
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
   showSnack: PropTypes.func.isRequired,
-  setHours: PropTypes.func.isRequired,
+  updateProfile: PropTypes.func.isRequired,
   info: PropTypes.object.isRequired
 };
 
@@ -137,7 +137,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  setHours: setHours,
+  updateProfile: updateProfile,
   showSnack: showSnack
 };
 

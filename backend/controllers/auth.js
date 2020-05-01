@@ -54,7 +54,7 @@ async function signUp(req, res, next) {
   }
 }
 
-async function updateHours(req, res, next) {
+async function updateProfile(req, res, next) {
   try {
     //validate the request body
     const { error } = validateUpdate(req.body);
@@ -62,6 +62,7 @@ async function updateHours(req, res, next) {
     
     const user = await User.findOne({ _id: req.user._id });
     Object.assign(user, req.body);
+    user.role = req.user.role;
     const updatedUser = await user.save();
     const token = updatedUser.generateAuthToken();
       res.json({
@@ -84,5 +85,5 @@ async function updateHours(req, res, next) {
 module.exports = {
   signIn,
   signUp,
-  updateHours
+  updateProfile
 };

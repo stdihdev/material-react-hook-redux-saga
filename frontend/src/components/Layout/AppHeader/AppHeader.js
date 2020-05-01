@@ -53,11 +53,15 @@ function AppHeader(props) {
                 <Button color="inherit">Users</Button>
               </NavLink>
               }
-              {(me.role >= ROLES.MANAGER) &&
               <NavLink className={classes.navLink} activeClassName={classes.active} to="/records">
                 <Button color="inherit">Records</Button>
               </NavLink>
-              }
+              <NavLink
+                className={classes.navLink}
+                activeClassName={classes.active}
+                to="/profile">
+                <Button color="inherit">profile</Button>
+              </NavLink>
               <NavLink
                 className={classes.navLink}
                 activeClassName={classes.active}

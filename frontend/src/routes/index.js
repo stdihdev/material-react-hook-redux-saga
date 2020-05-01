@@ -2,6 +2,7 @@ import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import SignIn from '../pages/Auth/SignIn';
 import SignUp from '../pages/Auth/SignUp';
+import Profile from '../pages/Auth/Profile';
 import RecordsList from '../pages/Records/RecordsList';
 import UsersList from '../pages/Users/UsersList';
 import UserEdit from '../pages/Users/UserEdit';
@@ -20,6 +21,7 @@ const Routes = () => {
       <Route path='/login' component={SignIn} />
       <Route path='/signup' component={SignUp} />
       {isAuthenticated && <Switch>
+        <Route path='/profile' component={Profile} />
         <Route exact path="/records" component={RecordsList}/>
         <AdminOrManagerRoute exact path="/users">
           <UsersList/>

@@ -2,7 +2,7 @@
 export const SIGNIN = 'SIGNIN';
 export const SIGNOUT = 'SIGNOUT';
 export const SIGNUP = 'SIGNUP';
-export const SET_HOURS = 'SET_HOURS';
+export const UPDATE_PROFILE = 'UPDATE_PROFILE';
 
 // Time Records
 export const GET_RECORD = 'GET_RECORD';
