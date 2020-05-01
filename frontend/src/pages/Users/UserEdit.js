@@ -40,7 +40,8 @@ const validate = values => {
     'email',
     'firstName',
     'lastName',
-    'password'
+    'password',
+    'preferredWorkingHours'
   ];
   requiredFields.forEach(field => {
     if (!values[field]) {
@@ -54,6 +55,9 @@ const validate = values => {
   }
   if(values.lastName && !/^[a-zA-Z]+$/.test(values.lastName)) {
     errors.lastName = "Last Name must be string.";
+  }
+  if(values.preferredWorkingHours < 1 || values.preferredWorkingHours > 24) {
+    errors.preferredWorkingHours = 'Preferred Working Hours should be between 1 and 24.';
   }
   if (values.role < '0' || values.role > '2' ) {
     errors.role = "Required";
@@ -124,7 +128,8 @@ function UserEdit(props) {
     lastName: params.id && user ? user.lastName : '',
     email: params.id && user ? user.email : '',
     password: params.id && user ? '********' : '',
-    role: params.id && user ? user.role : ''
+    role: params.id && user ? user.role : '',
+    preferredWorkingHours: info ? info.preferredWorkingHours : ''
   };
 
   const handleSubmit = (values, actions) => {
@@ -228,6 +233,19 @@ function UserEdit(props) {
                     id="password"
                     type="password"
                     label="Password"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Field
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    component={TextField}
+                    name="preferredWorkingHours"
+                    type="number"
+                    inputProps={{ min: 1, max:24, step: 1 }}
+                    label="Preferred Working Hours"
                   />
                 </Grid>
                 <Grid item xs={12}>
